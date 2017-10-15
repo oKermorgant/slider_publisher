@@ -70,57 +70,71 @@ class SliderPublisher(QWidget):
         
         # to keep track of key ordering in the yaml file
         order = []
+        old = []
          
         for topic, info in yaml.load(content).items():
             pkg,msg = info['type'].split('/')
             pkgs.append(__import__(pkg, globals(), locals(), ['msg']))
             self.publishers[topic] = Publisher(topic, getattr(pkgs[-1].msg, msg), info)
+            order.append((topic,[]))
             for key in info:
                 self.values[key] = info[key]
-                order.append((content.find(' ' + key + ':'), key))
+                order[-1][1].append((content.find(' ' + key + ':'), key))
+                old.append((content.find(' ' + key + ':'), key))
                 for bound in ['min', 'max']:
                     self.values[key][bound] = float(self.values[key][bound])
                 self.values[key]['val'] = 0
-                
+            order[-1][1].sort()
+        order.sort(key = lambda x: x[1][0][0])
         # build sliders - thanks joint_state_publisher
         sliderUpdateTrigger = Signal()
         self.vlayout = QVBoxLayout(self)
         self.gridlayout = QGridLayout()
         font = QFont("Helvetica", 9, QFont.Bold)
+        topic_font = QFont("Helvetica", 10, QFont.Bold)
         
         sliders = []
         self.key_map = {}
+        y = 0
+        for topic,keys in order:
+            topic_layout = QVBoxLayout()
+            label = QLabel(topic)
+            label.setFont(topic_font)
+            topic_layout.addWidget(label)
+            self.gridlayout.addLayout(topic_layout, *(y, 0))
+            y+=1
+            for idx,key in keys:           
+                key_layout = QVBoxLayout()
+                row_layout = QHBoxLayout()
+                label = QLabel(key)
+                label.setFont(font)
+                row_layout.addWidget(label)
+                
+                display = QLineEdit("0.00")
+                display.setAlignment(Qt.AlignRight)
+                display.setFont(font)
+                display.setReadOnly(True)
+                
+                row_layout.addWidget(display)    
+                key_layout.addLayout(row_layout)
+                
+                slider = QSlider(Qt.Horizontal)
+                slider.setFont(font)
+                slider.setRange(0, RANGE)
+                slider.setValue(RANGE/2)
+                
+                key_layout.addWidget(slider)
+            
+                self.key_map[key] = {'slidervalue': 0, 'display': display, 'slider': slider}
+                slider.valueChanged.connect(self.onValueChanged)
+                self.gridlayout.addLayout(key_layout, *(y,0))
+                y+=1
+                #sliders.append(key_layout)
         
-        for idx,key in sorted(order):           
-            key_layout = QVBoxLayout()
-            row_layout = QHBoxLayout()
-            label = QLabel(key)
-            label.setFont(font)
-            row_layout.addWidget(label)
-            
-            display = QLineEdit("0.00")
-            display.setAlignment(Qt.AlignRight)
-            display.setFont(font)
-            display.setReadOnly(True)
-            
-            row_layout.addWidget(display)    
-            key_layout.addLayout(row_layout)
-            
-            slider = QSlider(Qt.Horizontal)
-            slider.setFont(font)
-            slider.setRange(0, RANGE)
-            slider.setValue(RANGE/2)
-            
-            key_layout.addWidget(slider)
-        
-            self.key_map[key] = {'slidervalue': 0, 'display': display, 'slider': slider}
-            slider.valueChanged.connect(self.onValueChanged)
-            sliders.append(key_layout)
-        
-        # Generate positions in grid and place sliders there
-        self.positions = [(y,0) for y in range(len(sliders))]
-        for item, pos in zip(sliders, self.positions):
-            self.gridlayout.addLayout(item, *pos)
+            # Generate positions in grid and place sliders there
+            #self.positions = [(y,0) for y in range(len(sliders))]
+            #for item, pos in zip(sliders, self.positions):
+            #    self.gridlayout.addLayout(item, *pos)
             
         self.vlayout.addLayout(self.gridlayout)            
         
