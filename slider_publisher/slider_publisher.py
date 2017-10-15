@@ -37,7 +37,15 @@ class Publisher:
             # get 1st field
             idx = key.find('.')
             self.write(getattr(msg, key[:idx]), key[idx+1:], val)
-        else:            
+        elif '[' in key:
+            field, idx = key[:-1].split('[')
+            idx = int(idx)
+            current = getattr(msg, field)
+            if len(current) <= idx:
+                current = [0 for i in range(idx+1)]
+            current[idx] = val
+            setattr(msg, field, current)
+        else:
             setattr(msg, key, val)
         
     def update(self, values):
