@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-    <node name="velocity_gui" pkg="slider_publisher" type="slider_publisher.py" output="screen" respawn="true">
-        <param name="file" value="$(find slider_publisher)/example/Velocity.yaml"/>
-    </node>
-</launch>

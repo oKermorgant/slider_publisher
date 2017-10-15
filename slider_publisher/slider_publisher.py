@@ -15,7 +15,7 @@ class Publisher:
     def __init__(self, topic, msg, d):
         self.topic = topic
         self.msg = msg()
-        self.pub = rospy.Publisher(topic, msg, queue_size=1)            
+        self.pub = rospy.Publisher(topic, msg, queue_size=1)        
             
         # init map from GUI to message
         self.map = {}
@@ -27,23 +27,25 @@ class Publisher:
             else:
                 if key != 'type':
                     # init non-zero defaults
-                    self.write(key, d[key], self.msg)
+                    self.write(self.msg, key, d[key])
                 to_remove.append(key)
         for rm in to_remove:
             d.pop(rm)
                                     
-    def write(self,key, val, msg):
+    def write(self,msg, key, val):
         if '.' in key:
             # get 1st field
             idx = key.find('.')
-            self.write(key[idx+1:], val, getattr(msg, key[:idx]))
+            self.write(getattr(msg, key[:idx]), key[idx+1:], val)
         else:            
             setattr(msg, key, val)
         
-        
     def update(self, values):
         for key in self.map:
-            self.write(self.map[key], values[key]['val'], self.msg)
+            self.write(self.msg, self.map[key], values[key]['val'])
+        # update time if stamped msg
+        if hasattr(self.msg, "header"):
+            self.write(self.msg, 'header.stamp', rospy.Time.now())
         self.pub.publish(self.msg)
 
 

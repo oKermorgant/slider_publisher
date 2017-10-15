@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="file" default="VelocityStamped.yaml"/>
     <node name="velocity_gui" pkg="slider_publisher" type="slider_publisher.py" output="screen" respawn="true">
-        <param name="file" value="$(find slider_publisher)/example/Velocity.yaml"/>
+        <param name="file" value="$(find slider_publisher)/example/$(arg file)"/>
     </node>
 </launch>
