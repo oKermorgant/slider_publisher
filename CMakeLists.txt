@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   rqt_gui_py
 )
 
-catkin_python_setup()
-
 catkin_package()
+
+catkin_install_python(PROGRAMS slider_publisher
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
