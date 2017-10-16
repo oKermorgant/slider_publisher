@@ -2,11 +2,15 @@
 
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any type of message.
 
-Two examples are given, for 1 (velocity.launch) and 2 topics (velpose.launch) published from the same GUI.
+Several examples are given:
+*   roslaunch example.launch for 1 topic (cmd_vel)
+*   roslaunch example.launch file:=VelocityStamped.yaml for timestamped Twist
+*   roslaunch example.launch file:=VelPose.yaml for 2 topics (Twist + Pose)
+*   roslaunch example.launch file:=MultiArray.yaml for a topic with 4 floats
 
 Array-based messages are possible only for floating point arrays. 
 
-The packages reduces to a single node that has to be called either with a ~file param or an argument leading to a YAML file with the following structure (examples corresponding to the Velocity.yaml file):
+The packages reduces to a single node that has to be called either with a ~file param or an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
     topic_to_be_published:  
         type: full message type               (geometry_msgs/Twist)  
