@@ -1,4 +1,4 @@
-test:
+test/multiarray:
     type: std_msgs/Float32MultiArray
     alpha:
         min: -1
