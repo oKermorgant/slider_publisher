@@ -189,7 +189,7 @@ if __name__ == "__main__":
         content = f.read()
                         
     # build GUI
-    title = os.path.splitext(os.path.split(filename)[-1])[0]
+    title = rospy.get_name().split('/')[-1]
     app = QApplication([title])    
     sp = SliderPublisher(content)
     Thread(target=sp.loop).start()
