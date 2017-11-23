@@ -2,8 +2,8 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2017-11-23)
+------------------
 * title is now node name
 * Twist without default
 * velocity -> twist
