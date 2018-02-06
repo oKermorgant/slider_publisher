@@ -12,7 +12,7 @@ import signal
 RANGE = 1000
 
 class Publisher:
-    def __init__(self, topic, msg, d):
+    def __init__(self, topic, msg, info):
         self.topic = topic
         self.msg = msg()
         self.pub = rospy.Publisher(topic, msg, queue_size=1)        
@@ -20,17 +20,17 @@ class Publisher:
         # init map from GUI to message
         self.map = {}
         to_remove = []
-        for key in d:
-            if type(d[key]) == dict:
-                self.map[key] = d[key]['to']
-                d[key].pop('to')
+        for key in info:
+            if type(info[key]) == dict:
+                self.map[key] = info[key]['to']
+                info[key].pop('to')
             else:
                 if key != 'type':
                     # init non-zero defaults
-                    self.write(self.msg, key, d[key])
+                    self.write(self.msg, key, info[key])
                 to_remove.append(key)
         for rm in to_remove:
-            d.pop(rm)
+            info.pop(rm)
                                     
     def write(self,msg, key, val):
         if '.' in key:
@@ -42,7 +42,10 @@ class Publisher:
             idx = int(idx)
             current = getattr(msg, field)
             if len(current) <= idx:
-                current = [0 for i in range(idx+1)]
+                if 'name' in field:
+                    current += ['' for i in range(idx +1 - len(current))]
+                else:
+                    current = [0 for i in range(idx +1 - len(current))]
             current[idx] = val
             setattr(msg, field, current)
         else:
