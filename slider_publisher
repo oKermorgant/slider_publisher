@@ -33,7 +33,8 @@ class Publisher:
             info.pop(rm)
                                     
     def write(self, msg, key, val):
-       if '.' in key:
+        
+        if '.' in key:
             # get 1st field
             idx = key.find('.')
             self.write(getattr(msg, key[:idx]), key[idx+1:], val)
