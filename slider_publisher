@@ -41,7 +41,7 @@ class Publisher:
         elif '[' in key:
             field, idx = key[:-1].split('[')
             idx = int(idx)
-            print current
+            current = getattr(msg, field)
             if len(current) <= idx:
                 if 'name' in field:
                     current += ['' for i in range(idx +1 - len(current))]
