@@ -32,20 +32,22 @@ class Publisher:
         for rm in to_remove:
             info.pop(rm)
                                     
-    def write(self,msg, key, val):
-        if '.' in key:
+    def write(self, msg, key, val):
+       if '.' in key:
             # get 1st field
             idx = key.find('.')
             self.write(getattr(msg, key[:idx]), key[idx+1:], val)
         elif '[' in key:
             field, idx = key[:-1].split('[')
             idx = int(idx)
-            current = getattr(msg, field)
+            print current
             if len(current) <= idx:
                 if 'name' in field:
                     current += ['' for i in range(idx +1 - len(current))]
                 else:
-                    current = [0 for i in range(idx +1 - len(current))]
+                    current += [0 for i in range(idx +1 - len(current))]
+
+
             current[idx] = val
             setattr(msg, field, current)
         else:
