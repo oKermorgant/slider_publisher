@@ -8,58 +8,101 @@ from python_qt_binding.QtCore import Signal, Qt,  pyqtSlot
 from python_qt_binding.QtGui import QFont
 from threading import Thread
 import signal
+from geometry_msgs.msg import Quaternion
+from functools import reduce
+from sympy import N as eval_expr
+from tf.transformations import quaternion_from_euler
 
 RANGE = 1000
+
+def rsetattr(obj, attr, val):
+    pre, _, post = attr.rpartition('.')
+    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+
+def rgetattr(obj, attr, *args):
+    if attr == '':
+        return obj
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
+    return reduce(_getattr, [obj] + attr.split('.'))
+
+def split_field(key):
+    if '.' in key:
+        return key.rsplit('.', 1)
+    return '', key
+
+def isRPY(key, msg):
+    is_axis = False
+    field, axis = split_field(key)
+    if axis in ('roll', 'pitch', 'yaw'):
+        return type(rgetattr(msg, field)) == Quaternion
+    return False
 
 class Publisher:
     def __init__(self, topic, msg, info):
         self.topic = topic
         self.msg = msg()
-        self.pub = rospy.Publisher(topic, msg, queue_size=1)        
+        self.pub = rospy.Publisher(topic, msg, queue_size=1)
+        self.rpy = {}
             
         # init map from GUI to message
         self.map = {}
         to_remove = []
         for key in info:
             if type(info[key]) == dict:
+                if isRPY(info[key]['to'], self.msg):
+                    field, axis = split_field(info[key]['to'])
+                    if field not in self.rpy:
+                        self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
                 self.map[key] = info[key]['to']
                 info[key].pop('to')
             else:
                 if key != 'type':
                     # init non-zero defaults
-                    self.write(self.msg, key, info[key])
+                    if isRPY(key, self.msg):
+                        field, axis = split_field(key)
+                        if field not in self.rpy:
+                            self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
+                        self.rpy[field][axis]  = eval_expr(info[key])
+                    else:
+                        self.write(self.msg, key, eval_expr(info[key]))
                 to_remove.append(key)
         for rm in to_remove:
             info.pop(rm)
-                                    
-    def write(self, msg, key, val):
+                           
+    def write(self, key, val):
         
-        if '.' in key:
-            # get 1st field
-            idx = key.find('.')
-            self.write(getattr(msg, key[:idx]), key[idx+1:], val)
-        elif '[' in key:
+        field, axis = split_field(key)
+        if field in self.rpy:
+            self.rpy[field][axis] = val
+        elif '[' in key:        
             field, idx = key[:-1].split('[')
             idx = int(idx)
-            current = getattr(msg, field)
+            current = rgetattr(msg, field)
             if len(current) <= idx:
                 if 'name' in field:
                     current += ['' for i in range(idx +1 - len(current))]
                 else:
                     current += [0 for i in range(idx +1 - len(current))]
-
-
             current[idx] = val
-            setattr(msg, field, current)
+            rsetattr(self.msg, field, current)
         else:
-            setattr(msg, key, val)
+            rsetattr(self.msg, key, val)
         
     def update(self, values):
         for key in self.map:
-            self.write(self.msg, self.map[key], values[key]['val'])
+            self.write(self.map[key], values[key]['val'])
+        # write RPY's to Quaternions
+        for field in self.rpy:
+            q = quaternion_from_euler(self.rpy[field]['roll'],self.rpy[field]['pitch'], self.rpy[field]['yaw'])
+            for idx, axis in enumerate(('x','y','z','w')):
+                if field:
+                    rsetattr(self.msg, field + '.' + axis, q[idx])
+                else:
+                    setattr(self.msg, axis, q[idx])
         # update time if stamped msg
         if hasattr(self.msg, "header"):
-            self.write(self.msg, 'header.stamp', rospy.Time.now())
+            self.write('header.stamp', rospy.Time.now())
         self.pub.publish(self.msg)
 
 
@@ -88,7 +131,7 @@ class SliderPublisher(QWidget):
                 order[-1][1].append((content.find(' ' + key + ':'), key))
                 old.append((content.find(' ' + key + ':'), key))
                 for bound in ['min', 'max']:
-                    self.values[key][bound] = float(self.values[key][bound])
+                    self.values[key][bound] = eval_expr(self.values[key][bound])
                 self.values[key]['val'] = 0
             order[-1][1].sort()
         order.sort(key = lambda x: x[1][0][0])
