@@ -38,6 +38,17 @@ def isRPY(key, msg):
         return type(rgetattr(msg, field)) == Quaternion
     return False
 
+def robust_eval(val):
+    if type(val) in (list,tuple):
+        return [robust_eval(v) for v in val]
+    if type(val) == str:    # evaluate only if can be converted to float
+        try:
+            out = float(eval_expr(val))
+            return out
+        except:
+            return val
+    return float(val)
+
 class Publisher:
     def __init__(self, topic, msg, info):
         self.topic = topic
@@ -63,9 +74,9 @@ class Publisher:
                         field, axis = split_field(key)
                         if field not in self.rpy:
                             self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
-                        self.rpy[field][axis]  = eval_expr(info[key])
+                        self.rpy[field][axis]  = robust_eval(info[key])
                     else:
-                        self.write(self.msg, key, eval_expr(info[key]))
+                        self.write(key, robust_eval(info[key]))
                 to_remove.append(key)
         for rm in to_remove:
             info.pop(rm)
@@ -78,7 +89,7 @@ class Publisher:
         elif '[' in key:        
             field, idx = key[:-1].split('[')
             idx = int(idx)
-            current = rgetattr(msg, field)
+            current = rgetattr(self.msg, field)
             if len(current) <= idx:
                 if 'name' in field:
                     current += ['' for i in range(idx +1 - len(current))]
@@ -131,7 +142,7 @@ class SliderPublisher(QWidget):
                 order[-1][1].append((content.find(' ' + key + ':'), key))
                 old.append((content.find(' ' + key + ':'), key))
                 for bound in ['min', 'max']:
-                    self.values[key][bound] = eval_expr(self.values[key][bound])
+                    self.values[key][bound] = robust_eval(self.values[key][bound])
                 self.values[key]['val'] = 0
             order[-1][1].sort()
         order.sort(key = lambda x: x[1][0][0])
@@ -241,6 +252,7 @@ if __name__ == "__main__":
     title = rospy.get_name().split('/')[-1]
     app = QApplication([title])    
     sp = SliderPublisher(content)
+    #pause
     Thread(target=sp.loop).start()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sp.show()
