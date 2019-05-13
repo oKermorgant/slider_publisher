@@ -49,6 +49,9 @@ def robust_eval(val):
             return val
     return float(val)
 
+def key_tag(topic, key):
+    return topic + '/' + key
+
 class Publisher:
     def __init__(self, topic, msg, info):
         self.topic = topic
@@ -60,12 +63,13 @@ class Publisher:
         self.map = {}
         to_remove = []
         for key in info:
+            tag = key_tag(topic, key)
             if type(info[key]) == dict:
                 if isRPY(info[key]['to'], self.msg):
                     field, axis = split_field(info[key]['to'])
                     if field not in self.rpy:
                         self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
-                self.map[key] = info[key]['to']
+                self.map[tag] = info[key]['to']
                 info[key].pop('to')
             else:
                 if key != 'type':
@@ -101,8 +105,8 @@ class Publisher:
             rsetattr(self.msg, key, val)
         
     def update(self, values):
-        for key in self.map:
-            self.write(self.map[key], values[key]['val'])
+        for tag in self.map:
+            self.write(self.map[tag], values[tag]['val'])
         # write RPY's to Quaternions
         for field in self.rpy:
             q = quaternion_from_euler(self.rpy[field]['roll'],self.rpy[field]['pitch'], self.rpy[field]['yaw'])
@@ -138,12 +142,13 @@ class SliderPublisher(QWidget):
             self.publishers[topic] = Publisher(topic, getattr(pkgs[-1].msg, msg), info)
             order.append((topic,[]))
             for key in info:
-                self.values[key] = info[key]
+                tag = key_tag(topic,key)
+                self.values[tag] = info[key]
                 order[-1][1].append((content.find(' ' + key + ':'), key))
                 old.append((content.find(' ' + key + ':'), key))
                 for bound in ['min', 'max']:
-                    self.values[key][bound] = robust_eval(self.values[key][bound])
-                self.values[key]['val'] = 0
+                    self.values[tag][bound] = robust_eval(self.values[tag][bound])
+                self.values[tag]['val'] = 0
             order[-1][1].sort()
         order.sort(key = lambda x: x[1][0][0])
         # build sliders - thanks joint_state_publisher
@@ -163,7 +168,8 @@ class SliderPublisher(QWidget):
             topic_layout.addWidget(label)
             self.gridlayout.addLayout(topic_layout, *(y, 0))
             y+=1
-            for idx,key in keys:           
+            for idx,key in keys:
+                tag = key_tag(topic,key)
                 key_layout = QVBoxLayout()
                 row_layout = QHBoxLayout()
                 label = QLabel(key)
@@ -185,7 +191,7 @@ class SliderPublisher(QWidget):
                 
                 key_layout.addWidget(slider)
             
-                self.key_map[key] = {'slidervalue': 0, 'display': display, 'slider': slider}
+                self.key_map[tag] = {'slidervalue': 0, 'display': display, 'slider': slider}
                 slider.valueChanged.connect(self.onValueChanged)
                 self.gridlayout.addLayout(key_layout, *(y,0))
                 y+=1
@@ -204,8 +210,8 @@ class SliderPublisher(QWidget):
             
         self.center(1)
         
-    def sliderToValue(self, slider, key):
-        val = self.values[key]
+    def sliderToValue(self, slider, tag):
+        val = self.values[tag]
         return val['min'] + slider*(val['max'] - val['min'])/RANGE            
         
     @pyqtSlot(int)
