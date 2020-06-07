@@ -17,7 +17,10 @@ RANGE = 1000
 
 def rsetattr(obj, attr, val):
     pre, _, post = attr.rpartition('.')
-    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+    if pre:
+        return setattr(rgetattr(obj, pre), post, val)
+    # convert to expected field type
+    return setattr(obj, post, type(getattr(obj, post))(val))
 
 def rgetattr(obj, attr, *args):
     if attr == '':
@@ -136,7 +139,7 @@ class SliderPublisher(QWidget):
         order = []
         old = []
          
-        for topic, info in yaml.load(content).items():
+        for topic, info in yaml.safe_load(content).items():
             pkg,msg = info['type'].split('/')
             pkgs.append(__import__(pkg, globals(), locals(), ['msg']))
             self.publishers[topic] = Publisher(topic, getattr(pkgs[-1].msg, msg), info)
