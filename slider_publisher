@@ -187,7 +187,7 @@ class SliderPublisher(QWidget):
                 slider = QSlider(Qt.Horizontal)
                 slider.setFont(font)
                 slider.setRange(0, RANGE)
-                slider.setValue(RANGE/2)
+                slider.setValue(int(RANGE/2))
                 
                 key_layout.addWidget(slider)
             
@@ -225,7 +225,7 @@ class SliderPublisher(QWidget):
             
     def center(self, event):
         for key, key_info in self.key_map.items():
-            key_info['slider'].setValue(RANGE/2)
+            key_info['slider'].setValue(int(RANGE/2))
         self.onValueChanged(event)
             
         
