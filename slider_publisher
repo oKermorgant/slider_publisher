@@ -239,7 +239,6 @@ class SliderPublisher(QWidget):
                 self.publishers[pub].update(self.values)
             rate.sleep()
             
-
 if __name__ == "__main__":
     
     rospy.init_node('slider_publisher')
@@ -266,11 +265,4 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     sp.show()
     sys.exit(app.exec_())
-
-        
-    
-        
-        
-    
-    
     
