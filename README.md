@@ -10,7 +10,7 @@ Several examples are given:
 
 Array-based messages are possible only for floating point arrays. 
 
-The packages reduces to a single node that has to be called either with a ~file param or an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
+The packages reduces to a single node that has to be called either with an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
     topic_to_be_published:  
         type: full message type               (geometry_msgs/Twist)  
