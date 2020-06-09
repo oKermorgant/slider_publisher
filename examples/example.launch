@@ -2,8 +2,6 @@
 <launch>
     <arg name="file" default="TwistStamped.yaml"/>
     <node pkg="slider_publisher" exec="slider_publisher" name="velocity" output="screen"
-          args="$(find-pkg-share slider_publisher)/examples/TwistStamped.yaml">
-<!--         <param name="file" value="$(find-pkg-share slider_publisher)/examples/$(arg file)"/> -->
-<!--          <param name="file" value="/home/olivier/code/ros2/src/slider_publisher/examples/Twist.yaml"/> -->
+          args="$(find-pkg-share slider_publisher)/examples/$(var file)">
     </node>
 </launch>
