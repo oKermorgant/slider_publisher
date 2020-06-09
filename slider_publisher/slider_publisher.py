@@ -125,7 +125,7 @@ class Publisher:
             if field:
                 rsetattr(self.msg, field, quaternion_msg(self.rpy[field]), False)
             else:
-                setattr(self.msg, quaternion_msg(self.rpy[field]))
+                self.msg = quaternion_msg(self.rpy[field])
 
         # update time if classical stamped msg
         if hasattr(self.msg, 'header'):
