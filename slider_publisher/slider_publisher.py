@@ -101,21 +101,19 @@ class Publisher:
             info.pop(rm)
                            
     def write(self, key, val):
-        
         field, axis = split_field(key)
         if field in self.rpy:
             self.rpy[field][axis] = val
-        elif '[' in key:        
+        elif '[' in key:
             field, idx = key[:-1].split('[')
             idx = int(idx)
             current = rgetattr(self.msg, field)
             if len(current) <= idx:
-                if 'name' in field:
-                    current += ['' for i in range(idx +1 - len(current))]
-                else:
-                    current += [0 for i in range(idx +1 - len(current))]
+                default_val = 'name' in field and '' or 0
+                for _ in range(idx +1 - len(current)):
+                    current.append(default_val)
             current[idx] = val
-            rsetattr(self.msg, field, current)
+            rsetattr(self.msg, field, current, False)
         else:
             rsetattr(self.msg, key, val)
         
