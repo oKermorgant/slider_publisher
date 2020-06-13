@@ -249,6 +249,8 @@ class SliderPublisher(QWidget):
             self.publishers[pub].update(self.values)
         
 def main(args=None):
+    
+    print(sys.argv[1:])
        
     rclpy.init(args=args)
     node = rclpy.create_node('slider_publisher')

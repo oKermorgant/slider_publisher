@@ -11,7 +11,7 @@ setup(
     packages=[package_name],
     # Files we want to install, specifically launch files
     data_files=[
-        #('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         # Include our package.xml file
         (os.path.join('share', package_name), ['package.xml']),
         # Include all launch files.
