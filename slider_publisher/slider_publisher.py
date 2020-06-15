@@ -10,7 +10,6 @@ from threading import Thread
 import signal
 from geometry_msgs.msg import Quaternion
 from functools import reduce
-from sympy import N as eval_expr
 from scipy.spatial.transform import Rotation
 
 RANGE = 1000
@@ -55,12 +54,19 @@ def isRPY(key, msg):
 def robust_eval(val):
     if type(val) in (list,tuple):
         return [robust_eval(v) for v in val]
-    if type(val) == str:    # evaluate only if can be converted to float
-        try:
-            out = float(eval_expr(val))
-            return out
-        except:
-            return val
+    if type(val) == str:
+        val_expr = val.strip().lower()
+        
+        # check for  Pi fractions 
+        for sign, sign_rep in ((1, ''), (-1, '-')):
+            if val_expr == sign_rep + 'pi':
+                return sign*pi
+            
+            for denom in range(2, 13):
+                if val_expr == sign_rep + 'pi/' + str(denom):
+                    return sign * pi/denom
+        return val
+    
     return float(val)
 
 def key_tag(topic, key):

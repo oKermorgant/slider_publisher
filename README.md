@@ -3,10 +3,10 @@
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any type of message.
 
 Several examples are given:
-*   roslaunch example.launch for timestamped Twist (cmd_vel)
-*   roslaunch example.launch file:=Twist.yaml for non-timestamped Twist
-*   roslaunch example.launch file:=VelPose.yaml for 2 topics (Twist + Pose)
-*   roslaunch example.launch file:=MultiArray.yaml for a topic with 4 floats
+*   ros2 launch example.launch for timestamped Twist (cmd_vel)
+*   ros2 launch example.launch file:=Twist.yaml for non-timestamped Twist
+*   ros2 launch example.launch file:=VelPose.yaml for 2 topics (Twist + Pose)
+*   ros2 launch example.launch file:=MultiArray.yaml for a topic with 4 floats
 
 Array-based messages are possible only for floating point arrays. 
 
@@ -22,3 +22,5 @@ The packages reduces to a single node that has to be called either with an argum
             ...
     other_topic_to_be_published:  
         type...
+
+Hard-coded numeric values (bounds / constant values in messages) can be defined using fractions of pi.
