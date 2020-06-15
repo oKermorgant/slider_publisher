@@ -22,3 +22,6 @@ The packages reduces to a single node that has to be called either with a ~file 
             ...
     other_topic_to_be_published:  
         type...
+
+        
+Hard-coded numeric values (bounds / constant values in messages) can be defined using fractions of pi.
