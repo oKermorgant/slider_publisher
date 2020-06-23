@@ -11,6 +11,7 @@ import signal
 from geometry_msgs.msg import Quaternion
 from functools import reduce
 from scipy.spatial.transform import Rotation
+from numpy import pi
 
 RANGE = 1000
 
@@ -59,6 +60,7 @@ def robust_eval(val):
         
         # check for  Pi fractions 
         for sign, sign_rep in ((1, ''), (-1, '-')):
+
             if val_expr == sign_rep + 'pi':
                 return sign*pi
             
