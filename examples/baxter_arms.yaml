@@ -1,0 +1,32 @@
+/robot/limb/left/joint_command:
+    type: baxter_core_msgs/JointCommand
+    mode: 1
+    names: ['left_s0', 'left_s1', 'left_e0', 'left_e1', 'left_w0', 'left_w1', 'left_w2']
+    s0:
+        to: command[0]
+        min: -pi
+        max: pi
+    s1:
+        to: command[1]
+        min: -pi
+        max: pi
+    e0:
+        to: command[2]
+        min: -pi
+        max: pi
+    e1:
+        to: command[3]
+        min: -pi
+        max: pi 
+    w0:
+        to: command[4]
+        min: -pi
+        max: pi
+    w1:
+        to: command[5]
+        min: -pi
+        max: pi 
+    w2:
+        to: command[6]
+        min: -pi
+        max: pi
