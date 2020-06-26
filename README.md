@@ -1,6 +1,6 @@
 # slider_publisher
 
-This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any type of message.
+This package proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any type of message.
 
 Several examples are given:
 *   roslaunch example.launch for timestamped Twist (cmd_vel)
