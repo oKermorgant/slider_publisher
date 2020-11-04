@@ -276,8 +276,8 @@ def main(args=None):
         content = f.read()
 
     # build GUI
-    title = node.get_name().split('/')[-1]
-    app = QApplication([title.title()])    
+    full_namespace = '{}/{}'.format(node.get_namespace().strip('/'), node.get_name())
+    app = QApplication([full_namespace])    
     sp = SliderPublisher(node, content)
     #pause
     Thread(target=rclpy.spin, args=(node,)).start()

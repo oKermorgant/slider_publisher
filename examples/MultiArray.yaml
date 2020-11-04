@@ -1,5 +1,5 @@
 test/multiarray:
-    type: std_msgs/Float32MultiArray
+    type: example_interfaces/Float32MultiArray
     alpha:
         min: -1
         max: 1
