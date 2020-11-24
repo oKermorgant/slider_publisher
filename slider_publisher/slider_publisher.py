@@ -147,6 +147,9 @@ class SliderPublisher(QWidget):
         super(SliderPublisher, self).__init__()
         
         content = content.replace('\t', '    ')
+        
+        self.running = True
+        self.node = node
                         
         # get message types
         self.publishers = {}
@@ -250,11 +253,21 @@ class SliderPublisher(QWidget):
         for key, key_info in self.key_map.items():
             key_info['slider'].setValue(int(RANGE/2))
         self.onValueChanged(event)
-            
-        
+                    
     def publish(self):      
         for pub in self.publishers:
             self.publishers[pub].update(self.values)
+            
+    def closeEvent(self, event):
+        self.running = False
+        
+    def loop(self):
+        while self.running and rclpy.ok():
+            rclpy.spin_once(self.node, timeout_sec=0.1)
+            
+        if self.running:
+            self.node.destroy_node()
+            rclpy.shutdown()        
         
 def main(args=None):
            
@@ -279,11 +292,17 @@ def main(args=None):
     full_namespace = '{}/{}'.format(node.get_namespace().strip('/'), node.get_name())
     app = QApplication([full_namespace])    
     sp = SliderPublisher(node, content)
-    #pause
-    Thread(target=rclpy.spin, args=(node,)).start()
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    sp.show()
-    sys.exit(app.exec_())
+    
+    try:
+        Thread(target=sp.loop).start()
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        sp.show()
+        app.exec_()
+        sp.running = False
+    except:
+        node.destroy_node()
+        rclpy.shutdown()
+    sp.running = False
             
             
 if __name__ == "__main__":
