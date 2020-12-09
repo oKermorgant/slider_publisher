@@ -46,7 +46,6 @@ def split_field(key):
     return '', key
 
 def isRPY(key, msg):
-    is_axis = False
     field, axis = split_field(key)
     if axis in ('roll', 'pitch', 'yaw'):
         return type(rgetattr(msg, field)) == Quaternion
@@ -274,15 +273,11 @@ def main(args=None):
     rclpy.init(args=args)
     node = rclpy.create_node('slider_publisher')
     
-    # read passed param
+    # read passed param file
     filename = len(sys.argv) > 1 and sys.argv[1] or ''
     if not os.path.exists(filename):
-        if not node.has_parameter("file"):
-            print("Pass a yaml file as argument")
-            # TODO why can't parameter be read?
-            #filename = '/home/olivier/code/ros2/src/slider_publisher/examples/TwistStamped.yaml'
-            sys.exit(0)
-        filename = node.get_parameter("file")
+        node.get_logger().error("did not get any configuration file, was '{}'".format(filename))
+        sys.exit(0)
         
     # also get order from file
     with open(filename) as f:

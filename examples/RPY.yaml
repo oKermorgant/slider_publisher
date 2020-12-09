@@ -1,7 +1,7 @@
 orientation:
     type: geometry_msgs/Quaternion
     theta: 
-        min: -3.14
-        max: 3.14
-        to: yaw
+        min: -pi
+        max: pi
+        to: yaw # will publish corresponding quaternion
         
