@@ -13,14 +13,9 @@ Changelog for package slider_publisher
 * Update README.md
 * topic paths
 * without python setup as its only an executable
-* now displays topicsin GUI
-* ok for arrays of float
-* Merge branch 'master' of github.com:oKermorgant/slider_publisher
-  README from GH
+* now displays topics in GUI
+* works for arrays of float
 * default timestamp if in message header
-* Update README.md
-* Update README.md
-* Update README.md
 * more README
 * initial commit
 * Contributors: Olivier Kermorgant
