@@ -4,9 +4,9 @@ This packages proposes a slider-based publisher node similar to the joint_state_
 
 Several examples are given:
 *   `ros2 launch example.launch` for timestamped Twist (cmd_vel)
-*   `ros2 launch example.launch` file:=Twist.yaml for non-timestamped Twist
-*   `ros2 launch example.launch` file:=VelPose.yaml for 2 topics (Twist + Pose)
-*   `ros2 launch example.launch` file:=MultiArray.yaml for a topic with 4 floats
+*   `ros2 launch example.launch file:=Twist.yaml` for non-timestamped Twist
+*   `ros2 launch example.launch file:=VelPose.yaml` for 2 topics (Twist + Pose)
+*   `ros2 launch example.launch file:=MultiArray.yaml` for a topic with 4 floats
 
 Array-based messages are possible only for floating point arrays. 
 
