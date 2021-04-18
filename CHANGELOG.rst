@@ -5,8 +5,8 @@ Changelog for package slider_publisher
 ------------------
 * ROS 2 branch
 
-Forthcoming
------------
+1.0.2 (2021-04-18)
+------------------
 * README typo
 * Contributors: Olivier Kermorgant
 
