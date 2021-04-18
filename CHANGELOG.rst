@@ -5,6 +5,11 @@ Changelog for package slider_publisher
 ------------------
 * ROS 2 branch
 
+Forthcoming
+-----------
+* README typo
+* Contributors: Olivier Kermorgant
+
 0.1.1 (2017-11-23)
 ------------------
 * title is now node name
