@@ -2,6 +2,20 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update README.md
+* baxter example
+* Remove dependency to sympy
+* empty lines
+* Python 3 compat
+* solve bug when multiple keys with same name
+* robust eval for numeric vs PI expressions
+* with RPY sliders
+* multiarray bug in some cases
+* fix init bug for arrays
+* Contributors: Olivier Kermorgant
+
 0.1.1 (2017-11-23)
 ------------------
 * title is now node name
