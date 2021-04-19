@@ -2,8 +2,8 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2021-04-19)
+------------------
 * Update README.md
 * baxter example
 * Remove dependency to sympy
