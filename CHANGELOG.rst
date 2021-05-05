@@ -2,6 +2,11 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* bump cmake version to comply with policy CMP0048
+* Contributors: Olivier Kermorgant
+
 1.0.0 (2021-04-19)
 ------------------
 * Update README.md
