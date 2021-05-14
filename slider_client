@@ -75,12 +75,22 @@ class Client:
         for key in info:
             tag = key_tag(topic, key)
             if type(info[key]) == dict:
+                if isRPY(info[key]['to'], self.req):
+                    field, axis = split_field(info[key]['to'])
+                    if field not in self.rpy:
+                        self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
                 self.map[tag] = info[key]['to']
                 info[key].pop('to')
             else:
                 if key != 'type':
                     # init non-zero defaults
-                    self.write(key, robust_eval(info[key]))
+                    if isRPY(key, self.req):
+                        field, axis = split_field(key)
+                        if field not in self.rpy:
+                            self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
+                        self.rpy[field][axis]  = robust_eval(info[key])
+                    else:
+                        self.write(key, robust_eval(info[key]))
                 to_remove.append(key)
         for rm in to_remove:
             info.pop(rm)
@@ -88,7 +98,9 @@ class Client:
     def write(self, key, val):
         
         field, axis = split_field(key)
-        if '[' in key:        
+        if field in self.rpy:
+            self.rpy[field][axis] = val
+        elif '[' in key:        
             field, idx = key[:-1].split('[')
             idx = int(idx)
             current = rgetattr(self.req, field)
@@ -105,6 +117,18 @@ class Client:
     def update(self, values):
         for tag in self.map:
             self.write(self.map[tag], values[tag]['val'])
+        # write RPY's to Quaternions
+        for field in self.rpy:
+            q = quaternion_from_euler(self.rpy[field]['roll'],self.rpy[field]['pitch'], self.rpy[field]['yaw'])
+            for idx, axis in enumerate(('x','y','z','w')):
+                if field:
+                    rsetattr(self.req, field + '.' + axis, q[idx])
+                else:
+                    setattr(self.req, axis, q[idx])
+        # update time if stamped msg
+        if hasattr(self.req, "header"):
+            self.write('header.stamp', rospy.Time.now())
+            
         try:
             self.cli(self.req)
         except rospy.ServiceException as exc:
