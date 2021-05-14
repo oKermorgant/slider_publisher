@@ -1,0 +1,31 @@
+/tpo_control_cartesio/set_tpo_stiff:
+    type: tpo_msgs/SetControlGroupFloatArray
+    joint1:
+        min: 0
+        max: 10
+        to: data[0]
+    joint2: 
+        min: 0
+        max: 10
+        to: data[1]
+    joint3:
+        min: 0
+        max: 10
+        to: data[2]
+    joint4:
+        min: 0
+        max: 10
+        to: data[3]
+    joint5:
+        min: 0
+        max: 10
+        to: data[4]
+    joint6:
+        min: 0
+        max: 10
+        to: data[5]
+    joint7:
+        min: 0
+        max: 10
+        to: data[6]
+

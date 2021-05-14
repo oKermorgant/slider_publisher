@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="file" default="ServiceExample.yaml"/>
+    <node name="example_gui" pkg="slider_publisher" type="slider_client" output="screen" respawn="true">
+        <param name="file" value="$(find slider_publisher)/examples/$(arg file)"/>
+    </node>
+</launch>
