@@ -173,7 +173,10 @@ class SliderPublisher(QWidget):
                 old.append((content.find(' ' + key + ':'), key))
                 for bound in ['min', 'max']:
                     self.values[tag][bound] = robust_eval(self.values[tag][bound])
-                self.values[tag]['val'] = 0
+                if 'default' in info[key]:
+                    self.values[tag]['default'] = robust_eval(info[key]['default'])
+                else:
+                    self.values[tag]['default'] = .5*(info[key]['min']+info[key]['max'])
             order[-1][1].sort()
         order.sort(key = lambda x: x[1][0][0])
         # build sliders - thanks joint_state_publisher
@@ -229,11 +232,11 @@ class SliderPublisher(QWidget):
             
         self.vlayout.addLayout(self.gridlayout)            
         
-        self.ctrbutton = QPushButton('Center', self)
-        self.ctrbutton.clicked.connect(self.center)
-        self.vlayout.addWidget(self.ctrbutton)
+        self.reset_button = QPushButton('Reset', self)
+        self.reset_button.clicked.connect(self.reset)
+        self.vlayout.addWidget(self.reset_button)
             
-        self.center(1)
+        self.reset(1)
         
     def sliderToValue(self, slider, tag):
         val = self.values[tag]
@@ -248,9 +251,10 @@ class SliderPublisher(QWidget):
             self.values[key]['val'] = self.sliderToValue(key_info['slidervalue'], key)    
             key_info['display'].setText("%.2f" % self.values[key]['val'])        
             
-    def center(self, event):
-        for key, key_info in self.key_map.items():
-            key_info['slider'].setValue(int(RANGE/2))
+    def reset(self, event):
+        for key, key_info in self.key_map.items():            
+            slider = (self.values[key]['default']-self.values[key]['min'])/(self.values[key]['max']-self.values[key]['min'])*RANGE
+            key_info['slider'].setValue(int(slider))
         self.onValueChanged(event)
                     
     def publish(self):      

@@ -18,6 +18,7 @@ The packages reduces to a single node that has to be called with an argument lea
             to: corresponding_message_field   (linear.x)  
             min: slider minimum value         (-1)  
             max: slider maximum value         (+1)  
+            default: slider default value     (if not: (min+max)/2)
         other_key:  
             ...
     other_topic_to_be_published:  
