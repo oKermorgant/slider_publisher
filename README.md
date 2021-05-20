@@ -18,6 +18,7 @@ The packages reduces to a single node that has to be called either with a ~file 
             to: corresponding_message_field   (linear.x)  
             min: slider minimum value         (-1)  
             max: slider maximum value         (+1)  
+            default: slider default value     (if not: (min+max)/2)
         other_key:  
             ...
     other_topic_to_be_published:  
@@ -25,3 +26,4 @@ The packages reduces to a single node that has to be called either with a ~file 
 
         
 Hard-coded numeric values (bounds / constant values in messages) can be defined using fractions of pi.
+All sliders may also have a default value defined with the `default` keyword.
