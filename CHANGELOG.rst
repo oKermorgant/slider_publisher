@@ -1,7 +1,7 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1.1.0 (2021-08-18)
+2.0.0 (2021-08-18)
 ------------------
 * add service and detects value type (float / int / bool)
 * can pick default value
