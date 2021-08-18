@@ -5,7 +5,6 @@ Forthcoming
 -----------
 * add service and detects value type (float / int / bool)
 * can pick default value
-* version in setup.py
 * Contributors: Olivier Kermorgant
 
 1.0.2 (2021-04-18)
