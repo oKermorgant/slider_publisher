@@ -39,7 +39,8 @@ setup(
     # scripts here.
     entry_points={
         'console_scripts': [
-            'slider_publisher = slider_publisher.slider_publisher:main'
+            'slider_publisher = slider_publisher.slider_publisher:main',
+            'dummy_gazebo_server = slider_publisher.dummy_gazebo_server:main'
         ],
     },
 )

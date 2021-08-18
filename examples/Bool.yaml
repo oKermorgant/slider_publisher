@@ -1,0 +1,4 @@
+bool_msg:
+    type: example_interfaces/Bool
+    yes_or_no:
+        to: data
