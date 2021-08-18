@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>slider_publisher</name>
-  <version>1.1.0</version>
+  <version>2.0.0</version>
   <description>This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any type of message.</description>
 
   <maintainer email="olivier.kermorgant@ec-nantes.fr">Olivier Kermorgant</maintainer>
