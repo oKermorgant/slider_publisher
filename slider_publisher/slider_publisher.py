@@ -88,6 +88,9 @@ def get_type(msg, key):
         pkg, name = types[main].split('/')
         return get_type(get_interface(pkg, 'msg', name), nested)
     
+    # not nested -> raw types
+    if key not in types and key in ('roll', 'pitch', 'yaw'):
+        return 'double'
     out = types[key]
     if 'double' in out or 'float' in out:
         return 'double'
@@ -97,7 +100,7 @@ def get_type(msg, key):
 
 class Control:
     def __init__(self, msg, info):
-
+        
         self.type = get_type(msg, info['to'])
         
         if self.type in ('int', 'double'):
@@ -126,11 +129,12 @@ class Control:
     def reset(self):
         if self.range is None:
             self.box.setChecked(self.default)
+            return
         elif self.type == 'double':
             slider_val = (self.default-self.min)/(self.max-self.min)*self.range            
         else:
             slider_val = self.default-self.min
-        self.slider.setValue(int(slider_val))            
+        self.slider.setValue(int(slider_val))
         
     def refresh(self):
         if self.range is None:
@@ -273,10 +277,11 @@ class SliderPublisher(QWidget):
          
         for topic, info in yaml.safe_load(content).items():
                         
-            if info['type'].count('/') == 2:
-                pkg,interface,msg = info['type'].split('/')
+            msg = info.pop('type')
+            if msg.count('/') == 2:
+                pkg,interface,msg = msg.split('/')
             else:
-                pkg,msg = info['type'].split('/')
+                pkg,msg = msg.split('/')
                 interface = None
             
             if interface is None:
@@ -309,8 +314,6 @@ class SliderPublisher(QWidget):
         self.vlayout = QVBoxLayout(self)
         self.gridlayout = QGridLayout()
         
-        sliders = []
-        self.key_map = {}
         y = 0
         for topic,keys in order:
             topic_layout = QVBoxLayout()
