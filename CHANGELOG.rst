@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.0.1 (2021-08-19)
+------------------
 * bug in type detection for roll pitch yaw
 * Contributors: Olivier Kermorgant
 
