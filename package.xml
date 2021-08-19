@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>slider_publisher</name>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <description>The slider_publisher package</description>
 
   <maintainer email="olivier.kermorgant@ec-nantes.fr">Olivier Kermorgant</maintainer>

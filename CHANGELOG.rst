@@ -2,8 +2,8 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.1 (2021-08-19)
+------------------
 * allow service calls / different control for double,int,bool
 * can pick default value
 * Contributors: Olivier Kermorgant
