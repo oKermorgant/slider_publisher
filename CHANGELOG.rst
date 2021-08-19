@@ -2,6 +2,12 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* allow service calls / different control for double,int,bool
+* can pick default value
+* Contributors: Olivier Kermorgant
+
 1.1.0 (2021-05-05)
 ------------------
 * bump cmake version to comply with policy CMP0048
