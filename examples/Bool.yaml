@@ -1,0 +1,4 @@
+bool_msg:
+    type: std_msgs/Bool
+    yes_or_no:
+        to: data

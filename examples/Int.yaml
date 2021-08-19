@@ -1,0 +1,7 @@
+int_msg:
+    type: std_msgs/Int32
+    int:
+        to: data
+        min: -20
+        max: 20
+        default: 4

@@ -8,7 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package()
 
-catkin_install_python(PROGRAMS slider_publisher
+catkin_install_python(PROGRAMS slider_publisher examples/dummy_gazebo_server.py
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(DIRECTORY examples
       DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="file" default="gazebo_service.yaml"/>
+    <node pkg="slider_publisher" type="slider_publisher" name="service" output="screen">
+        <param name="file" value="$(find slider_publisher)/examples/$(arg file)"/>
+    </node>
+    
+    <node pkg="slider_publisher" type="dummy_gazebo_server.py" name="gazebo" output="screen"/>
+</launch>
