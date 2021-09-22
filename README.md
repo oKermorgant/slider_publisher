@@ -10,7 +10,7 @@ Several examples are given:
 *   `ros2 launch gazebo_service.launch` for a service call (uses `gazebo_msgs`)
 
 Only numerical types or their derivatives can be publisher (ie there is no text input to change such value on-the-fly).
-Array-based messages are also possible. 
+Array-based messages are also possible for numerical values.
 
 The packages reduces to a single node that has to be called with an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
