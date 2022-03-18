@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.1.0 (2022-03-18)
+------------------
 * do not re-call service if request has not changed
 * example Twist defaults to 0 velocity
 * Contributors: Olivier Kermorgant
