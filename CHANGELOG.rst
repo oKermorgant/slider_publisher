@@ -1,6 +1,12 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* do not re-call service if request has not changed
+* example Twist defaults to 0 velocity
+* Contributors: Olivier Kermorgant
+
 2.0.1 (2021-08-19)
 ------------------
 * bug in type detection for roll pitch yaw
