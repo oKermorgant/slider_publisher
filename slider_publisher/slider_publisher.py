@@ -7,6 +7,7 @@ from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout,QHBox
 from python_qt_binding.QtCore import Signal, Qt,  pyqtSlot
 from python_qt_binding.QtGui import QFont
 from threading import Thread
+from copy import deepcopy
 import signal
 from geometry_msgs.msg import Quaternion
 from functools import reduce
@@ -184,6 +185,7 @@ class Publisher:
             self.client = None
         else:
             self.msg = msg.Request()
+            self.prev = msg.Request()
             self.pub = None
             self.client = Publisher.node.create_client(msg, topic)
             Publisher.node.get_logger().info('Waiting for service ' + topic)
@@ -252,9 +254,10 @@ class Publisher:
             
         if self.pub is not None:
             self.pub.publish(self.msg)
-        else:
-            # service call, dont care about the result
-            self.client.call_async(self.msg)            
+        elif self.msg != self.prev:
+            # service call, dont care about the result            
+            self.client.call_async(self.msg)          
+            self.prev = deepcopy(self.msg)
 
 class SliderPublisher(QWidget):
     def __init__(self, node, content):
