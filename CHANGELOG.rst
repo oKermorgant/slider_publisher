@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* underscores in setup.cfg
+* Contributors: Olivier Kermorgant
+
 2.1.0 (2022-03-18)
 ------------------
 * do not re-call service if request has not changed
