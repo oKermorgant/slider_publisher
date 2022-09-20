@@ -248,10 +248,10 @@ class Publisher:
 
         # update time if classical stamped msg
         if hasattr(self.msg, 'header'):
-            self.write('header.stamp', Publisher.node.get_clock().now().to_msg())        
+            self.write('header.stamp', Publisher.node.get_clock().now().to_msg())
         elif hasattr(self.msg, 'stamp'):
             self.write('stamp', Publisher.node.get_clock().now().to_msg())
-            
+                   
         if self.pub is not None:
             self.pub.publish(self.msg)
         elif self.msg != self.prev:
@@ -260,10 +260,21 @@ class Publisher:
             self.prev = deepcopy(self.msg)
 
 class SliderPublisher(QWidget):
-    def __init__(self, node, content):
+    def __init__(self, node, filename):
+        
+        from rcl_interfaces.msg import ParameterDescriptor, FloatingPointRange
+        
         super(SliderPublisher, self).__init__()
+        
+        if filename is None:
+            # no raw argument, should be set as parameter
+            filename = node.declare_parameter('config', '__').value
+            if not os.path.exists(filename):
+                node.get_logger().error('No configuration file given, give its path as an argument or use the `config` parameter')
+                sys.exit(0)
                 
-        content = content.replace('\t', '    ')
+        with open(filename) as f:
+            content = f.read().replace('\t', '    ')                
         
         self.running = True
         self.node = node
@@ -273,7 +284,14 @@ class SliderPublisher(QWidget):
         self.publishers = {}
         self.controls = {}
         
-        self.timer = node.create_timer(0.1, self.publish)
+        rate_param = ParameterDescriptor(
+                    name = 'rate',
+                    floating_point_range = [FloatingPointRange(
+                        from_value = 0.,
+                        to_value = 100.)])
+        rate = node.declare_parameter(rate_param.name, 0.1, rate_param).value
+        
+        self.timer = node.create_timer(1./rate, self.publish)
         
         # to keep track of key ordering in the yaml file
         order = []
@@ -367,7 +385,7 @@ class SliderPublisher(QWidget):
             control.reset()            
         self.onValueChanged(event)
                     
-    def publish(self):      
+    def publish(self):
         for pub in self.publishers:
             self.publishers[pub].update(self.controls)
             
@@ -382,25 +400,20 @@ class SliderPublisher(QWidget):
             self.node.destroy_node()
             rclpy.shutdown()        
         
-def main(args=None):
+def main(args=None):       
            
     rclpy.init(args=args)
     node = rclpy.create_node('slider_publisher')
-    
+        
     # read passed param file
     filename = len(sys.argv) > 1 and sys.argv[1] or ''
     if not os.path.exists(filename):
-        node.get_logger().error("did not get any configuration file, was '{}'".format(filename))
-        sys.exit(0)
+        filename = None
         
-    # also get order from file
-    with open(filename) as f:
-        content = f.read()
-
     # build GUI
     full_namespace = '{}/{}'.format(node.get_namespace().strip('/'), node.get_name())
     app = QApplication([full_namespace])    
-    sp = SliderPublisher(node, content)
+    sp = SliderPublisher(node, filename)
     
     try:
         Thread(target=sp.loop).start()
