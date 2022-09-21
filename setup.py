@@ -6,7 +6,7 @@ package_name = 'slider_publisher'
 
 setup(
     name=package_name,
-    version='1.0.2',
+    version='2.2.0',
     # Packages to export
     packages=[package_name],
     # Files we want to install, specifically launch files

@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.2.0 (2022-09-21)
+------------------
 * add python3-scipy and numpy dependencies
 * rate and config parameters
 * Contributors: Olivier Kermorgant
