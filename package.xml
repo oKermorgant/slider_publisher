@@ -9,11 +9,13 @@
 
   <license>MIT</license>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
   <exec_depend>rqt_gui_py</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-scipy</exec_depend>
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
   
 </package>
