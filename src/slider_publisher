@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import rclpy
 import yaml
 import sys
@@ -289,7 +289,7 @@ class SliderPublisher(QWidget):
                     floating_point_range = [FloatingPointRange(
                         from_value = 0.,
                         to_value = 100.)])
-        rate = node.declare_parameter(rate_param.name, 0.1, rate_param).value
+        rate = node.declare_parameter(rate_param.name, 10., rate_param).value
         
         self.timer = node.create_timer(1./rate, self.publish)
         

@@ -8,8 +8,8 @@ install(DIRECTORY
         DESTINATION share/${PROJECT_NAME})
 
 install(PROGRAMS
-        src/slider_publisher.py
-        src/dummy_gazebo_server.py
+        src/slider_publisher
+        src/dummy_gazebo_server
         DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
