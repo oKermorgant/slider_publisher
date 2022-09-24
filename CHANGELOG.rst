@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.2.1 (2022-09-24)
+------------------
 * remove py extension, fix rate default value
 * switch to CMake to avoid deprecation messages
 * Contributors: Olivier Kermorgant
