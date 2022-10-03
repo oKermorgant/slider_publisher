@@ -237,10 +237,11 @@ class Publisher:
             self.client(self.msg)
 
 class SliderPublisher(QWidget):
-    def __init__(self, content):
+    def __init__(self, content, rate):
         super(SliderPublisher, self).__init__()
         
         content = content.replace('\t', '    ')
+        self.rate = rospy.Rate(rate)
         
         # get message types
         self.publishers = {}
@@ -347,11 +348,10 @@ class SliderPublisher(QWidget):
         self.onValueChanged(event)                
                     
     def loop(self):        
-        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             for pub in self.publishers:
                 self.publishers[pub].update(self.controls)
-            rate.sleep()
+            self.rate.sleep()
             
 if __name__ == "__main__":
     
@@ -364,7 +364,10 @@ if __name__ == "__main__":
             rospy.logerr("Pass a yaml file (~file param or argument)")
             sys.exit(0)
         filename = rospy.get_param("~file")
-        
+
+    rate = 10.
+    if rospy.has_param('~rate'):
+        rate = rospy.get_param('~rate')
     
     # also get order from file
     with open(filename) as f:

@@ -31,3 +31,7 @@ Hard-coded numeric values (bounds / constant values in messages) can be defined 
 3D rotations (ie quaternions) can be parameterized as roll / pitch / yaw (see `RPY.yaml`). While these fields are of course not part of a `Quaternion` message, the corresponding 3D rotation will be built and published.
 
 If the type is a service interface then the corresponding slider will call the service, after waiting for the server.
+
+## Parameters
+
+ - `~rate` (default 10): the rate of publication
