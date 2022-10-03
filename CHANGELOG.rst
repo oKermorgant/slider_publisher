@@ -2,6 +2,12 @@
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add rate
+* Twist default to 0 velocity
+* Contributors: Olivier Kermorgant
+
 1.1.1 (2021-08-19)
 ------------------
 * allow service calls / different control for double,int,bool
