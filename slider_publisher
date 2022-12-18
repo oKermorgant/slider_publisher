@@ -5,6 +5,9 @@ import yaml
 import sys
 import os
 from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout,QHBoxLayout,QGridLayout, QLabel, QSlider, QLineEdit, QPushButton, QCheckBox
+#  add import QStyleOptionSlider
+from python_qt_binding.QtWidgets import QStyleOptionSlider
+from PyQt5 import QtCore, QtWidgets
 from python_qt_binding.QtCore import Signal, Qt,  pyqtSlot
 from python_qt_binding.QtGui import QFont
 from threading import Thread
@@ -17,6 +20,14 @@ from tf.transformations import quaternion_from_euler
 font = QFont("Helvetica", 9, QFont.Bold)
 topic_font = QFont("Helvetica", 10, QFont.Bold)
 rospack = RosPack()
+
+class SliderProxyStyle(QtWidgets.QProxyStyle):
+    def pixelMetric(self, metric, option, widget):
+        if metric == QtWidgets.QStyle.PM_SliderThickness:
+            return 40
+        elif metric == QtWidgets.QStyle.PM_SliderLength:
+            return 40
+        return super().pixelMetric(metric, option, widget)
 
 def rsetattr(obj, attr, val):
     pre, _, post = attr.rpartition('.')
@@ -123,7 +134,9 @@ class Control:
             slider_val = (self.default-self.min)/(self.max-self.min)*self.range            
         else:
             slider_val = self.default-self.min
-        self.slider.setValue(int(slider_val))            
+        
+        #self.slider.setValue(int(slider_val))       
+        self.slider.setValue(slider_val)            
         
     def refresh(self):
         if self.range is None:
@@ -132,6 +145,7 @@ class Control:
             slider_val = self.slider.value()
             if self.type == 'double':
                 self.value = self.min + slider_val*(self.max - self.min)/self.range
+                # place to round values
                 self.display.setText(f'{round(self.value, 2)}')
             else:
                 self.value = self.min + slider_val
@@ -139,12 +153,17 @@ class Control:
     
     def init_slider(self):
         
+        # place to round values
         self.display = QLineEdit(f'{round(self.value, 2)}')
         self.display.setAlignment(Qt.AlignRight)
         self.display.setFont(font)
         self.display.setReadOnly(True)
+        # change size, width, height
+        self.display.setFixedWidth(500)
                                     
         self.slider = QSlider(Qt.Horizontal)
+        style = SliderProxyStyle(self.slider.style())
+        self.slider.setStyle(style)
         self.slider.setFont(font)
         self.slider.setRange(0, self.range)
         self.reset()
@@ -295,8 +314,8 @@ class SliderPublisher(QWidget):
         sliderUpdateTrigger = Signal()
         self.vlayout = QVBoxLayout(self)
         self.gridlayout = QGridLayout()
-        font = QFont("Helvetica", 9, QFont.Bold)
-        topic_font = QFont("Helvetica", 10, QFont.Bold)
+        font = QFont("Helvetica", 19, QFont.Bold)
+        topic_font = QFont("Helvetica", 20, QFont.Bold)
         
         y = 0
         for topic,keys in order:

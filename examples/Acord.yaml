@@ -1,0 +1,10 @@
+acord_msg:
+    type: std_msgs/Float32MultiArray
+    height:
+        min: 0
+        max: 1
+        to: data[0]
+    rotation: 
+        min: 0
+        max: 1
+        to: data[1]
