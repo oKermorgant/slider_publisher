@@ -376,7 +376,7 @@ if __name__ == "__main__":
     # build GUI
     title = rospy.get_name().split('/')[-1]
     app = QApplication([title])    
-    sp = SliderPublisher(content)
+    sp = SliderPublisher(content, rate=rate)
     #pause
     Thread(target=sp.loop).start()
     signal.signal(signal.SIGINT, signal.SIG_DFL)
