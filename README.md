@@ -2,6 +2,8 @@
 
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
 
+**Known bug** version 2.2.0 introduced a `rate` parameter to choose at which rate messages are published. The default value for the rate was erroneously set to `0.1` while it should have been `10`. This version was released in the `Foxy` September sync. A way to avoid the issue is to set the `rate` parameter to `10`, or use the source version until the bug fix makes it to the next release.
+
 Several examples are given:
 *   `ros2 launch example.launch` for timestamped Twist (cmd_vel)
 *   `ros2 launch example.launch file:=Twist.yaml` for non-timestamped Twist
