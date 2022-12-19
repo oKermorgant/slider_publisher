@@ -17,7 +17,7 @@
     e1:
         to: command[3]
         min: -pi
-        max: pi 
+        max: pi
     w0:
         to: command[4]
         min: -pi
@@ -25,7 +25,7 @@
     w1:
         to: command[5]
         min: -pi
-        max: pi 
+        max: pi
     w2:
         to: command[6]
         min: -pi

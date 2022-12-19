@@ -1,27 +1,27 @@
 /cmd_vel:
     type: geometry_msgs/Twist
-    vx: 
+    vx:
         min: -1
         max: 1
         to: linear.x
         default: 0.
-    vy: 
+    vy:
         min: -1
         max: 1
         to: linear.y
-    vz: 
+    vz:
         min: -1
         max: 1
         to: linear.z
-    wx: 
+    wx:
         min: -1
         max: 1
         to: angular.x
-    wy: 
+    wy:
         min: -1
         max: 1
-        to: angular.y        
-    wz: 
+        to: angular.y
+    wz:
         min: -1
         max: 1
         to: angular.z

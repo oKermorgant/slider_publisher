@@ -11,4 +11,4 @@ rospy.init_node('gazebo')
 s = rospy.Service('/gazebo/set_model_state', SetModelState, set_model_state_callback)
 rospy.spin()
 
- 
+
