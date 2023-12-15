@@ -11,8 +11,7 @@ from copy import deepcopy
 import signal
 from geometry_msgs.msg import Quaternion
 from functools import reduce
-from scipy.spatial.transform import Rotation
-from numpy import pi
+from math import pi, cos, sin
 from ament_index_python import get_package_share_directory
 
 font = QFont("Helvetica", 9, QFont.Bold)
@@ -41,13 +40,20 @@ def rgetattr(obj, attr, *args):
 
 
 def quaternion_msg(rpy):
-    q = Rotation.from_euler('xyz',(rpy['roll'], rpy['pitch'], rpy['yaw'])).as_quat()
-    Q = Quaternion()
-    Q.x = q[0]
-    Q.y = q[1]
-    Q.z = q[2]
-    Q.w = q[3]
-    return Q
+
+    def cossin(angle):
+        return cos(angle), sin(angle)
+
+    cr,sr = cossin(rpy['roll']/2)
+    cp,sp = cossin(rpy['pitch']/2)
+    cy,sy = cossin(rpy['yaw']/2)
+
+    q = Quaternion()
+    q.w = cr * cp * cy + sr * sp * sy
+    q.x = sr * cp * cy - cr * sp * sy
+    q.y = cr * sp * cy + sr * cp * sy
+    q.z = cr * cp * sy - sr * sp * cy
+    return q
 
 
 def split_field(key):
