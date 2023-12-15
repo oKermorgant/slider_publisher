@@ -33,9 +33,12 @@ def rgetattr(obj, attr, *args):
     if attr == '':
         return obj
 
+    return eval(f'obj.{attr}')
+
     def _getattr(obj, attr):
         return getattr(obj, attr, *args)
     return reduce(_getattr, [obj] + attr.split('.'))
+
 
 def quaternion_msg(rpy):
     q = Rotation.from_euler('xyz',(rpy['roll'], rpy['pitch'], rpy['yaw'])).as_quat()
@@ -53,20 +56,13 @@ def split_field(key):
     return '', key
 
 
-def isRPY(key, msg):
-    field, axis = split_field(key)
-    if axis in ('roll', 'pitch', 'yaw'):
-        return type(rgetattr(msg, field)) == Quaternion
-    return False
-
-
 def robust_eval(val):
     if type(val) in (list,tuple):
         return [robust_eval(v) for v in val]
     if type(val) == str:
         val_expr = val.strip().lower()
         
-        # check for  Pi fractions 
+        # check for  Pi fractions
         for sign, sign_rep in ((1, ''), (-1, '-')):
 
             if val_expr == sign_rep + 'pi':
@@ -85,18 +81,27 @@ def key_tag(topic, key):
 
 
 def get_interface(pkg, interface, name):
-    pkg = __import__(pkg, globals(), locals(), [interface])
-    return getattr(getattr(pkg,interface), name)
+    from importlib import import_module
+    pkg = import_module(f'{pkg}.{interface}')
+    return getattr(pkg, name)
 
 
-def get_type(msg, key):
+def get_type(msg, key, explicit = False):
+
     if '[' in key:
         key = ''.join(key.replace('[',']').split(']')[::2]).strip('.')
     types = msg.get_fields_and_field_types()
+    for field in types:
+        if '<' in types[field]:
+            types[field] = types[field].split('<')[1][:-1]
+
     if '.' in key:
         main, nested = key.split('.',1)
         pkg, name = types[main].split('/')
-        return get_type(get_interface(pkg, 'msg', name), nested)
+        return get_type(get_interface(pkg, 'msg', name), nested, explicit)
+
+    if explicit:
+        return types[key]
     
     # not nested -> raw types
     if key not in types and key in ('roll', 'pitch', 'yaw'):
@@ -107,6 +112,25 @@ def get_type(msg, key):
     if 'int' in out:
         return 'int'
     return 'bool'
+
+
+def isRPY(key, msg):
+    field, axis = split_field(key)
+
+    if axis in ('roll', 'pitch', 'yaw'):
+        if field:
+            return get_type(msg, field, True) == 'geometry_msgs/Quaternion'
+        else:
+            return type(msg) == Quaternion
+    return False
+
+
+def add_timestamp(msg, node):
+    # update time if classical stamped msg
+    if hasattr(msg, 'header'):
+        rsetattr(msg, 'header.stamp', node.get_clock().now().to_msg())
+    elif hasattr(msg, 'stamp'):
+        rsetattr(msg, 'stamp', node.get_clock().now().to_msg())
 
 
 class Control:
@@ -228,25 +252,49 @@ class Publisher:
                 to_remove.append(key)
         for rm in to_remove:
             info.pop(rm)
-                           
+
     def write(self, key, val):
+
         field, axis = split_field(key)
         if field in self.rpy:
             self.rpy[field][axis] = val
         elif '[' in key:
-            field, idx = key[:-1].split('[')
+            field, idx = key.split('[')
+            idx, subfield = idx.split(']')
             idx = int(idx)
             current = rgetattr(self.msg, field)
+
             if len(current) <= idx:
-                default_val = 'name' in field and '' or 0
-                for _ in range(idx + 1 - len(current)):
-                    current.append(default_val)
-            current[idx] = val
+                # identify what should go there
+                # pretty long/tedious but done only at first publication
+                field_type = self.msg.get_fields_and_field_types()[field]
+                field_type = field_type.split('<')[1][:-1]
+
+                if '/' in field_type:
+                    pkg,msg = field_type.split('/')
+                    field_type = get_interface(pkg, 'msg', msg)
+                elif field_type == 'string':
+                    field_type = str
+                elif 'int' in field_type:
+                    field_type = int
+                else:
+                    field_type = float
+                while len(current) <= idx:
+                    current.append(field_type())
+
+            if subfield:
+                rsetattr(current[idx], subfield[1:], val, False)
+
+            else:
+                current[idx] = val
+            add_timestamp(current[idx], Publisher.node)
             rsetattr(self.msg, field, current, False)
+
         else:
             rsetattr(self.msg, key, val)
         
     def update(self, values):
+
         for tag in self.map:
             self.write(self.map[tag], values[tag].value)
         # write RPY's to Quaternions
@@ -257,10 +305,7 @@ class Publisher:
                 self.msg = quaternion_msg(self.rpy[field])
 
         # update time if classical stamped msg
-        if hasattr(self.msg, 'header'):
-            self.write('header.stamp', Publisher.node.get_clock().now().to_msg())
-        elif hasattr(self.msg, 'stamp'):
-            self.write('stamp', Publisher.node.get_clock().now().to_msg())
+        add_timestamp(self.msg, Publisher.node)
                    
         if self.pub is not None:
             self.pub.publish(self.msg)

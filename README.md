@@ -2,8 +2,6 @@
 
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
 
-**Known bug** version 2.2.0 introduced a `rate` parameter to choose at which rate messages are published. The default value for the rate was erroneously set to `0.1` while it should have been `10`. This version was released in the `Foxy` September sync. A way to avoid the issue is to set the `rate` parameter to `10`, or use the source version until the bug fix makes it to the next release.
-
 Several examples are given:
 *   `ros2 launch example.launch` for timestamped Twist (cmd_vel)
 *   `ros2 launch example.launch file:=Twist.yaml` for non-timestamped Twist
@@ -11,8 +9,8 @@ Several examples are given:
 *   `ros2 launch example.launch file:=MultiArray.yaml` for a topic with 4 floats
 *   `ros2 launch gazebo_service.launch` for a service call (uses `gazebo_msgs`)
 
-Only numerical types or their derivatives can be publisher (ie there is no text input to change such value on-the-fly).
-Array-based messages are also possible for numerical values.
+Only numerical types or their derivatives can be published (ie there is no text input to change such value on-the-fly).
+Array-based messages are also possible (nested arrays are not).
 
 The packages reduces to a single node that has to be called with an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
