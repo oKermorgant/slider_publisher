@@ -1,0 +1,26 @@
+/tf:
+    type: tf2_msgs/msg/TFMessage
+    frame_id:
+        to: transforms[0].header.frame_id
+        default: world
+    child_frame_id:
+        to: transforms[0].child_frame_id
+        default: base_link
+    x:
+        to: transforms[0].transform.translation.x
+    y:
+        to: transforms[0].transform.translation.y
+    z:
+        to: transforms[0].transform.translation.z
+    pitch:
+        max: pi
+        min: -pi
+        to: transforms[0].transform.rotation.pitch
+    roll:
+        max: pi
+        min: -pi
+        to: transforms[0].transform.rotation.roll
+    yaw:
+        max: pi
+        min: -pi
+        to: transforms[0].transform.rotation.yaw

@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-    <arg name="file" default="gazebo_service.yaml"/>
-    <node pkg="slider_publisher" exec="slider_publisher" name="service" output="screen"
-          args="$(find-pkg-share slider_publisher)/examples/$(var file)">
-    </node>
-    
-    <node pkg="slider_publisher" exec="dummy_gazebo_server" name="gazebo" output="screen"/>
-</launch>

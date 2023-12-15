@@ -7,9 +7,7 @@ install(DIRECTORY
         examples
         DESTINATION share/${PROJECT_NAME})
 
-install(PROGRAMS
-        src/slider_publisher
-        src/dummy_gazebo_server
+install(PROGRAMS src/slider_publisher
         DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

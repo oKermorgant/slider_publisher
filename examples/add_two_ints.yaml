@@ -1,0 +1,7 @@
+/add_two_ints:
+    type: example_interfaces/srv/AddTwoInts
+    a:
+        min: -100
+        max: 100
+    b:
+        default: 3

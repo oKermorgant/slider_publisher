@@ -1,7 +1,0 @@
-/gazebo/set_model_state:
-    type: gazebo_msgs/SetModelState
-    model_state.model_name: 'some_model'
-    x:
-        to: model_state.pose.position.x
-        min: -100
-        max: 100

@@ -2,23 +2,25 @@
 
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
 
-Several examples are given:
-*   `ros2 launch example.launch` for timestamped Twist (cmd_vel)
-*   `ros2 launch example.launch file:=Twist.yaml` for non-timestamped Twist
-*   `ros2 launch example.launch file:=VelPose.yaml` for 2 topics (Twist + Pose)
-*   `ros2 launch example.launch file:=MultiArray.yaml` for a topic with 4 floats
-*   `ros2 launch gazebo_service.launch` for a service call (uses `gazebo_msgs`)
+Many examples are given, especially
+*   `ros2 launch slider_publisher example.launch file:=BasicTypes.yaml` for the 4 basic types
+*   `ros2 launch slider_publisher example.launch file:=Twist.yaml` for timestamped Twist (cmd_vel)
+*   `ros2 launch slider_publisher example.launch file:=tf.yaml` for a TF message
+*   `ros2 launch slider_publisher example.launch file:=VelPose.yaml` for 2 topics (Twist + Pose)
+*   `ros2 launch slider_publisher example.launch file:=MultiArray.yaml` for a topic with 4 floats
+*   `ros2 launch slider_publisher add_two_ints.launch` for a service call (uses `demo_nodes_cpp server`)
 
-Only numerical types or their derivatives can be published (ie there is no text input to change such value on-the-fly).
+Numerical types can be set either with a slider if min/max values are provided, or with text input.
+
 Array-based messages are also possible (nested arrays are not).
 
 The packages reduces to a single node that has to be called with an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
     topic_to_be_published:  
-        type: full message or service type               (geometry_msgs/Twist or geometry_msgs/msg/Twist to specify it is a message)  
-        key_as_in_gui:                        (vx)  
-            to: corresponding_message_field   (linear.x)  
-            min: slider minimum value         (-1)  
+        type: full message or service type    (geometry_msgs/Twist or geometry_msgs/msg/Twist)
+        key_as_in_gui:                        (vx, can also be the message field)
+            to: corresponding_message_field   (linear.x if not used as the key)
+            min: slider minimum value         (-1)
             max: slider maximum value         (+1)  
             default: slider default value     (if not: (min+max)/2)
         other_key:  

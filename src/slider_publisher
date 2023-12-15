@@ -10,12 +10,17 @@ from threading import Thread
 from copy import deepcopy
 import signal
 from geometry_msgs.msg import Quaternion
-from functools import reduce
 from math import pi, cos, sin
 from ament_index_python import get_package_share_directory
 
 font = QFont("Helvetica", 9, QFont.Bold)
 topic_font = QFont("Helvetica", 10, QFont.Bold)
+
+
+def rgetattr(obj, attr):
+    if attr == '':
+        return obj
+    return eval(f'obj.{attr}')
 
 
 def rsetattr(obj, attr, val, cast=True):
@@ -26,17 +31,6 @@ def rsetattr(obj, attr, val, cast=True):
         return setattr(obj, post, type(getattr(obj, post))(val))
     else:
         return setattr(obj, post, val)
-
-
-def rgetattr(obj, attr, *args):
-    if attr == '':
-        return obj
-
-    return eval(f'obj.{attr}')
-
-    def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
-    return reduce(_getattr, [obj] + attr.split('.'))
 
 
 def quaternion_msg(rpy):
@@ -92,7 +86,10 @@ def get_interface(pkg, interface, name):
     return getattr(pkg, name)
 
 
-def get_type(msg, key, explicit = False):
+def get_type(msg, key):
+
+    if not key:
+        return msg
 
     if '[' in key:
         key = ''.join(key.replace('[',']').split(']')[::2]).strip('.')
@@ -103,32 +100,35 @@ def get_type(msg, key, explicit = False):
 
     if '.' in key:
         main, nested = key.split('.',1)
-        pkg, name = types[main].split('/')
-        return get_type(get_interface(pkg, 'msg', name), nested, explicit)
+        pkg, submsg = types[main].split('/')
+        return get_type(get_interface(pkg, 'msg', submsg), nested)
 
-    if explicit:
-        return types[key]
-    
-    # not nested -> raw types
     if key not in types and key in ('roll', 'pitch', 'yaw'):
-        return 'double'
-    out = types[key]
-    if 'double' in out or 'float' in out:
-        return 'double'
-    if 'int' in out:
-        return 'int'
-    return 'bool'
+        return float
+
+    if '/' in types[key]:
+        pkg,submsg = types[key].split('/')
+        return get_interface(pkg, 'msg', submsg)
+
+    # basic types
+    if 'int' in types[key]:
+        return int
+    elif 'bool' in types[key]:
+        return bool
+    elif 'string' in types[key]:
+        return str
+    return float
 
 
 def isRPY(key, msg):
     field, axis = split_field(key)
 
-    if axis in ('roll', 'pitch', 'yaw'):
-        if field:
-            return get_type(msg, field, True) == 'geometry_msgs/Quaternion'
-        else:
-            return type(msg) == Quaternion
-    return False
+    if axis not in ('roll', 'pitch', 'yaw'):
+        return False
+    elif field:
+        return get_type(msg, field) == Quaternion
+
+    return type(msg) == Quaternion
 
 
 def add_timestamp(msg, node):
@@ -140,72 +140,127 @@ def add_timestamp(msg, node):
 
 
 class Control:
+
     def __init__(self, msg, info):
         
         self.type = get_type(msg, info['to'])
+
+        if self.type not in (int,float,bool,str):
+            msg = str(msg()).split('(')[0].replace('.','/')
+            raise AttributeError(f'{msg}: {info["to"]} is not a basic type, cannot create control')
         
-        if self.type in ('int', 'double'):
-            
-            self.min = self.conv(robust_eval(info['min']))
-            self.max = self.conv(robust_eval(info['max']))
-            self.range = 1000 if self.type == 'double' else self.max-self.min
-            self.default = self.conv(robust_eval(info['default'])) if 'default' in info else self.conv((self.max+self.min)/2)
-            self.value = self.default
-        
+        if self.type in (int,float):
+            if 'min' in info and 'max' in info:
+                self.min = self.type(robust_eval(info['min']))
+                self.max = self.type(robust_eval(info['max']))
+                self.range = 1000 if self.type == float else self.max-self.min
+                self.default = robust_eval(info['default']) if 'default' in info else (self.max+self.min)/2
+
+                if self.type == float:
+                    self.round = 2
+                    for bound in ('min', 'max'):
+                        val = getattr(self, bound)
+                        if val == 0:
+                            continue
+                        from math import log10, ceil
+                        self.round = max(self.round, int(ceil(-log10(abs(val)))+2))
+            else:
+                self.range = None
+                self.default = robust_eval(info['default']) if 'default' in info else 0
+
+        elif self.type == bool:
+            self.default = robust_eval(info['default']) if 'default' in info else False
         else:
-            self.range = None
-            self.default = self.conv(robust_eval(info['default'])) if 'default' in info else False
-            self.value = self.default
-                            
-    def conv(self, v):
-        if self.type == 'int':
-            return int(v)
-        if self.type == 'double':
-            return float(v)
-        if self.type == 'bool':
-            return bool(v)
-        print('Unknown type "{}"'.format(self.type))
-        return None
+            self.default = info['default'] if 'default' in info else ''
+
+        self.default = self.value = self.type(self.default)
     
-    def reset(self):
-        if self.range is None:
-            self.box.setChecked(self.default)
+    def reset(self, value = None):
+        if value is None:
+            value = self.default
+        if self.type == bool:
+            self.box.setChecked(value)
             return
-        elif self.type == 'double':
-            slider_val = (self.default-self.min)/(self.max-self.min)*self.range
+        elif self.type == str:
+            self.text.setText(value)
+            return
+        elif self.range is None:
+            self.display.setText(str(value))
+            self.value = value
+            return
+        elif self.type == float:
+            slider_val = (value-self.min)/(self.max-self.min)*self.range
         else:
-            slider_val = self.default-self.min
+            slider_val = value-self.min
         self.slider.setValue(int(slider_val))
-        
-    def refresh(self):
-        if self.range is None:
+
+    def refresh(self, event = None):
+
+        if self.type == bool:
             self.value = self.box.isChecked()
+        elif self.type == str:
+            self.value = self.text.text()
+        elif event is None or self.range is None:
+            # text was used, update slider
+            try:
+                new_val = self.type(float(self.display.text()))
+                if self.range is None:
+                    self.reset(new_val)
+                else:
+                    self.reset(min(self.max, max(self.min, new_val)))
+            except ValueError:
+                self.display.setText(f'{round(self.value, self.round)}')
         else:
+            # slider was used, update text
             slider_val = self.slider.value()
-            if self.type == 'double':
+            if self.type == float:
                 self.value = self.min + slider_val*(self.max - self.min)/self.range
-                self.display.setText(f'{round(self.value, 2)}')
+                self.display.setText(f'{round(self.value, self.round)}')
             else:
                 self.value = self.min + slider_val
                 self.display.setText(f'{self.value}')
+
+    def init_layout(self, label):
+
+        label = QLabel(label)
+        label.setFont(font)
+        key_layout = QVBoxLayout()
+        row_layout = QHBoxLayout()
+        row_layout.addWidget(label)
+
+        if self.type in (int,float):
+
+            self.display = QLineEdit()
+            self.display.setAlignment(Qt.AlignRight)
+            self.display.setFont(font)
+            self.display.returnPressed.connect(self.refresh)
+
+            row_layout.addWidget(self.display)
+            key_layout.addLayout(row_layout)
+            if self.range is not None:
+                self.slider = QSlider(Qt.Horizontal)
+                self.slider.setFont(font)
+                self.slider.setRange(0, self.range)
+                self.slider.valueChanged.connect(self.refresh)
+                key_layout.addWidget(self.slider)
+
+        elif self.type == bool:
+            self.box = QCheckBox()
+            self.box.clicked.connect(self.refresh)
+            row_layout.addWidget(self.box)
+            key_layout.addLayout(row_layout)
+        else:
+            # text
+            self.text = QLineEdit()
+            self.text.setAlignment(Qt.AlignLeft)
+            self.text.setFont(font)
+            self.text.returnPressed.connect(self.refresh)
+            row_layout.addWidget(self.text)
+            key_layout.addLayout(row_layout)
+
+        self.reset()
+        return key_layout
     
-    def init_slider(self):
-        
-        self.display = QLineEdit(f'{round(self.value, 2)}')
-        self.display.setAlignment(Qt.AlignRight)
-        self.display.setFont(font)
-        self.display.setReadOnly(True)
-                                    
-        self.slider = QSlider(Qt.Horizontal)
-        self.slider.setFont(font)
-        self.slider.setRange(0, self.range)
-        self.reset()
-        
-    def init_box(self):
-        
-        self.box = QCheckBox()
-        self.reset()
-        
 
 class Publisher:
     '''
@@ -236,26 +291,31 @@ class Publisher:
         # init map from GUI to message
         self.map = {}
         to_remove = []
-        for key in info:
-            tag = key_tag(topic, key)
-            if type(info[key]) == dict:
-                if isRPY(info[key]['to'], self.msg):
-                    field, axis = split_field(info[key]['to'])
+        for label in info:
+
+            tag = key_tag(topic, label)
+            if type(info[label]) == dict:
+
+                if 'to' not in info[label]:
+                    info[label]['to'] = label
+
+                if isRPY(info[label]['to'], self.msg):
+                    field, axis = split_field(info[label]['to'])
                     if field not in self.rpy:
                         self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
-                self.map[tag] = info[key]['to']
+                self.map[tag] = info[label]['to']
  
             else:
-                if key != 'type':
+                if label != 'type':
                     # init non-zero defaults
-                    if isRPY(key, self.msg):
-                        field, axis = split_field(key)
+                    if isRPY(label, self.msg):
+                        field, axis = split_field(label)
                         if field not in self.rpy:
                             self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
-                        self.rpy[field][axis] = robust_eval(info[key])
+                        self.rpy[field][axis] = robust_eval(info[label])
                     else:
-                        self.write(key, robust_eval(info[key]))
-                to_remove.append(key)
+                        self.write(label, robust_eval(info[label]))
+                to_remove.append(label)
         for rm in to_remove:
             info.pop(rm)
 
@@ -272,19 +332,7 @@ class Publisher:
 
             if len(current) <= idx:
                 # identify what should go there
-                # pretty long/tedious but done only at first publication
-                field_type = self.msg.get_fields_and_field_types()[field]
-                field_type = field_type.split('<')[1][:-1]
-
-                if '/' in field_type:
-                    pkg,msg = field_type.split('/')
-                    field_type = get_interface(pkg, 'msg', msg)
-                elif field_type == 'string':
-                    field_type = str
-                elif 'int' in field_type:
-                    field_type = int
-                else:
-                    field_type = float
+                field_type = get_type(self.msg, field)
                 while len(current) <= idx:
                     current.append(field_type())
 
@@ -384,7 +432,7 @@ class SliderPublisher(QWidget):
             for key in info:
                 tag = key_tag(topic,key)
                 
-                # identify key type -> slider (continuous or discrete) / checkbox
+                # identify key type -> slider (continuous or discrete) / checkbox / text
                 self.controls[tag] = Control(self.publishers[topic].msg, info[key])
                 
                 order[-1][1].append((content.find(' ' + key + ':'), key))
@@ -405,29 +453,8 @@ class SliderPublisher(QWidget):
             self.gridlayout.addLayout(topic_layout, *(y, 0))
             y += 1
             for idx,key in keys:
-                tag = key_tag(topic,key)
-                key_layout = QVBoxLayout()
-                row_layout = QHBoxLayout()
-                label = QLabel(key)
-                label.setFont(font)
-                row_layout.addWidget(label)
-                
-                if self.controls[tag].range is not None:
-                                
-                    self.controls[tag].init_slider()
-                
-                    row_layout.addWidget(self.controls[tag].display)
-                    key_layout.addLayout(row_layout)
-                    key_layout.addWidget(self.controls[tag].slider)
-                    self.controls[tag].slider.valueChanged.connect(self.onValueChanged)
-                    
-                else:
-                    self.controls[tag].init_box()
-                    row_layout.addWidget(self.controls[tag].box)
-                    key_layout.addLayout(row_layout)
-                    self.controls[tag].box.clicked.connect(self.onValueChanged)
-                
-                self.gridlayout.addLayout(key_layout, *(y,0))
+                self.gridlayout.addLayout(self.controls[key_tag(topic,key)].init_layout(key),
+                                          *(y,0))
                 y += 1
             
         self.vlayout.addLayout(self.gridlayout)
@@ -435,15 +462,11 @@ class SliderPublisher(QWidget):
         self.reset_button = QPushButton('Reset', self)
         self.reset_button.clicked.connect(self.reset)
         self.vlayout.addWidget(self.reset_button)
-                   
-    def onValueChanged(self, event):
-        for control in self.controls.values():
-            control.refresh()
-            
+
     def reset(self, event):
         for control in self.controls.values():
             control.reset()
-        self.onValueChanged(event)
+            control.refresh(event)
                     
     def publish(self):
         for pub in self.publishers:

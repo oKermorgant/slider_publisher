@@ -1,7 +1,0 @@
-int_msg:
-    type: example_interfaces/Int32
-    int:
-        to: data
-        min: -20
-        max: 20
-        default: 4

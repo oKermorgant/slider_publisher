@@ -1,0 +1,20 @@
+bool_topic:
+    type: example_interfaces/Bool
+    yes_or_no:
+        to: data
+int_topic:
+    type: example_interfaces/Int32
+    some_int:
+        to: data    # to min/max, text only
+        default: 4
+float_topic:
+    type: example_interfaces/Float64
+    data:   # field name can be used here, no need for to:
+        min: -pi
+        max: pi
+
+text_topic:
+    type: example_interfaces/String
+    message:
+        to: data
+        default: 'hello world'
