@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.3.0 (2023-12-16)
+------------------
 * text input
 * remove dependency on numpy/scipy, use basic math to handle Quaternions
 * can publish arrays of any type
