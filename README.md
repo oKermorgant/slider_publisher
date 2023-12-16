@@ -3,6 +3,7 @@
 This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
 
 Many examples are given, especially
+
 *   `ros2 launch slider_publisher example.launch file:=BasicTypes.yaml` for the 4 basic types
 *   `ros2 launch slider_publisher example.launch file:=Twist.yaml` for timestamped Twist (cmd_vel)
 *   `ros2 launch slider_publisher example.launch file:=tf.yaml` for a TF message
