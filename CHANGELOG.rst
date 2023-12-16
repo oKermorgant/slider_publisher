@@ -3,6 +3,8 @@ Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Forthcoming
 -----------
+* typo in readme
+* Contributors: Olivier Kermorgant
 
 2.3.0 (2023-12-16)
 ------------------
