@@ -1,0 +1,8 @@
+str_topic:
+    type: std_msgs/String
+    str:
+        default: [one,two,three]
+int_topic:
+    type: std_msgs/Int8
+    int:
+        default: [4,5,6]

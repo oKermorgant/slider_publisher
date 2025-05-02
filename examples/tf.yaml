@@ -2,7 +2,7 @@
     type: tf2_msgs/msg/TFMessage
     frame_id:
         to: transforms[0].header.frame_id
-        default: world
+        default: [world,map]
     child_frame_id:
         to: transforms[0].child_frame_id
         default: base_link

@@ -3,7 +3,7 @@ import rclpy
 import yaml
 import sys
 import os
-from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout,QHBoxLayout,QGridLayout, QLabel, QSlider, QLineEdit, QPushButton, QCheckBox
+from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout,QHBoxLayout,QGridLayout, QLabel, QSlider, QLineEdit, QPushButton, QCheckBox, QComboBox
 from python_qt_binding.QtCore import Signal, Qt
 from python_qt_binding.QtGui import QFont
 from threading import Thread
@@ -54,26 +54,6 @@ def split_field(key):
     if '.' in key:
         return key.rsplit('.', 1)
     return '', key
-
-
-def robust_eval(val):
-    if type(val) in (list,tuple):
-        return [robust_eval(v) for v in val]
-    if type(val) == str:
-        val_expr = val.strip().lower()
-        
-        # check for  Pi fractions
-        for sign, sign_rep in ((1, ''), (-1, '-')):
-
-            if val_expr == sign_rep + 'pi':
-                return sign*pi
-            
-            for denom in range(2, 13):
-                if val_expr == sign_rep + 'pi/' + str(denom):
-                    return sign * pi/denom
-        return val
-    
-    return float(val)
 
 
 def key_tag(topic, key):
@@ -128,7 +108,7 @@ def isRPY(key, msg):
     elif field:
         return get_type(msg, field) == Quaternion
 
-    return type(msg) == Quaternion
+    return isinstance(msg, Quaternion)
 
 
 def add_timestamp(msg, node):
@@ -137,6 +117,27 @@ def add_timestamp(msg, node):
         rsetattr(msg, 'header.stamp', node.get_clock().now().to_msg())
     elif hasattr(msg, 'stamp'):
         rsetattr(msg, 'stamp', node.get_clock().now().to_msg())
+
+
+def robust_eval(val, out_type = float):
+    if isinstance(val, (list,tuple)):
+        return [robust_eval(v, out_type) for v in val]
+    if isinstance(val,str):
+        val_expr = val.strip().lower()
+        
+        # check for  Pi fractions
+        for sign, sign_rep in ((1, ''), (-1, '-')):
+
+            if val_expr == f'{sign_rep}pi':
+                return sign*pi
+            
+            for denom in range(2, 13):
+                if val_expr == f'{sign_rep}pi/{denom}':
+                    return sign * pi/denom
+                elif val_expr == f'{sign_rep}{denom}pi' or val_expr == f'{sign_rep}{denom}*pi':
+                    return sign * pi*denom
+    
+    return out_type(val)
 
 
 class Control:
@@ -148,13 +149,21 @@ class Control:
         if self.type not in (int,float,bool,str):
             msg = str(msg()).split('(')[0].replace('.','/')
             raise AttributeError(f'{msg}: {info["to"]} is not a basic type, cannot create control')
+
+        self.choices = None
+        if 'default' in info and isinstance(info['default'], list) and len(info['default']) > 1:
+            self.choices = list(map(str,info['default']))
+            self.default = self.value = self.eval(self.choices[0])
+            return
         
+        self.default = self.type()
         if self.type in (int,float):
             if 'min' in info and 'max' in info:
-                self.min = self.type(robust_eval(info['min']))
-                self.max = self.type(robust_eval(info['max']))
+                self.min = self.eval(info['min'])
+                self.max = self.eval(info['max'])
                 self.range = 1000 if self.type == float else self.max-self.min
-                self.default = robust_eval(info['default']) if 'default' in info else (self.max+self.min)/2
+
+                self.default = self.type((self.max+self.min)/2)
 
                 if self.type == float:
                     self.round = 2
@@ -166,18 +175,20 @@ class Control:
                         self.round = max(self.round, int(ceil(-log10(abs(val)))+2))
             else:
                 self.range = None
-                self.default = robust_eval(info['default']) if 'default' in info else 0
 
-        elif self.type == bool:
-            self.default = robust_eval(info['default']) if 'default' in info else False
-        else:
-            self.default = info['default'] if 'default' in info else ''
+        self.default = self.value = self.eval(info['default']) if 'default' in info else self.default
 
-        self.default = self.value = self.type(self.default)
+    def eval(self, val):
+        return robust_eval(val, self.type)
     
     def reset(self, value = None):
         if value is None:
             value = self.default
+
+        if self.choices:
+            self.cbox.setCurrentIndex(0)
+            self.value = value
+            return
         if self.type == bool:
             self.box.setChecked(value)
             return
@@ -196,7 +207,9 @@ class Control:
 
     def refresh(self, event = None):
 
-        if self.type == bool:
+        if self.choices:
+            self.value = self.eval(self.choices[self.cbox.currentIndex()])
+        elif self.type == bool:
             self.value = self.box.isChecked()
         elif self.type == str:
             self.value = self.text.text()
@@ -228,7 +241,15 @@ class Control:
         row_layout = QHBoxLayout()
         row_layout.addWidget(label)
 
-        if self.type in (int,float):
+        if self.choices:
+            self.cbox = QComboBox()
+            self.cbox.currentIndexChanged.connect(self.refresh)
+            self.cbox.setFont(font)
+            self.cbox.addItems(self.choices)
+            row_layout.addWidget(self.cbox)
+            key_layout.addLayout(row_layout)
+
+        elif self.type in (int,float):
 
             self.display = QLineEdit()
             self.display.setAlignment(Qt.AlignRight)
@@ -320,7 +341,7 @@ class Publisher:
                             self.rpy[field] = {'roll': 0, 'pitch': 0, 'yaw': 0}
                         self.rpy[field][axis] = robust_eval(info[label])
                     else:
-                        self.write(label, robust_eval(info[label]))
+                        self.write(label, robust_eval(info[label], get_type(self.msg, label)))
                 to_remove.append(label)
         for rm in to_remove:
             info.pop(rm)
