@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.4.1 (2025-05-02)
+------------------
 * add combobox for defalut value as list
 * Contributors: Olivier Kermorgant
 
