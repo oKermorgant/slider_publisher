@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* add combobox for defalut value as list
+* Contributors: Olivier Kermorgant
+
 2.4.0 (2024-05-17)
 ------------------
 * no need to specify message field if there is only one
