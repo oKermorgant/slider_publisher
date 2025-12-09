@@ -1,8 +1,8 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
------------
+2.4.2 (2025-12-09)
+------------------
 * remove numpy / scipy deps, we use basic maths here
 * Contributors: Olivier Kermorgant
 
