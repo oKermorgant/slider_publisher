@@ -114,9 +114,9 @@ def isRPY(key, msg):
 def add_timestamp(msg, node):
     # update time if classical stamped msg
     if hasattr(msg, 'header'):
-        rsetattr(msg, 'header.stamp', node.get_clock().now().to_msg())
+        msg.header.stamp = node.get_clock().now().to_msg()
     elif hasattr(msg, 'stamp'):
-        rsetattr(msg, 'stamp', node.get_clock().now().to_msg())
+        msg.stamp = node.get_clock().now().to_msg()
 
 
 def robust_eval(val, out_type = float):
