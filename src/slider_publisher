@@ -220,7 +220,10 @@ class Control:
                 if self.range is None:
                     self.reset(new_val)
                 else:
-                    self.reset(min(self.max, max(self.min, new_val)))
+                    # make it robust to max < min
+                    lower = min(self.min, self.max)
+                    upper = max(self.min, self.max)
+                    self.reset(min(upper, max(lower, new_val)))
             except ValueError:
                 self.display.setText(f'{round(self.value, self.round)}')
         else:
