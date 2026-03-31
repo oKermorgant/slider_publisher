@@ -1,6 +1,13 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* add build status
+* robust to inverted min/max
+* time stamp is easier to write
+* Contributors: Olivier Kermorgant
+
 2.4.2 (2025-12-09)
 ------------------
 * remove numpy / scipy deps, we use basic maths here
