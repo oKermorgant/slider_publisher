@@ -3,7 +3,8 @@ import rclpy
 import yaml
 import sys
 import os
-from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout,QHBoxLayout,QGridLayout, QLabel, QSlider, QLineEdit, QPushButton, QCheckBox, QComboBox
+
+from python_qt_binding.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QSlider, QLineEdit, QPushButton, QCheckBox, QComboBox
 from python_qt_binding.QtCore import Signal, Qt
 from python_qt_binding.QtGui import QFont
 from threading import Thread
@@ -13,8 +14,13 @@ from geometry_msgs.msg import Quaternion
 from math import pi, cos, sin
 from ament_index_python import get_package_share_directory
 
-font = QFont("Helvetica", 9, QFont.Bold)
-topic_font = QFont("Helvetica", 10, QFont.Bold)
+from python_qt_binding import QT_BINDING_VERSION
+
+qt5 = QT_BINDING_VERSION.startswith('5.')
+font = QFont("Helvetica", 9)
+font.setBold(True)
+topic_font = QFont("Helvetica", 10)
+topic_font.setBold(True)
 
 
 def rgetattr(obj, attr):
@@ -143,21 +149,22 @@ def robust_eval(val, out_type = float):
 class Control:
 
     def __init__(self, msg, info):
-        
+
         self.type = get_type(msg, info['to'])
 
-        if self.type not in (int,float,bool,str):
-            msg = str(msg()).split('(')[0].replace('.','/')
+        if self.type not in (int, float, bool, str):
+            msg = str(msg()).split('(')[0].replace('.', '/')
             raise AttributeError(f'{msg}: {info["to"]} is not a basic type, cannot create control')
 
         self.choices = None
         if 'default' in info and isinstance(info['default'], list) and len(info['default']) > 1:
-            self.choices = list(map(str,info['default']))
+            self.choices = list(map(str, info['default']))
             self.default = self.value = self.eval(self.choices[0])
             return
         
         self.default = self.type()
-        if self.type in (int,float):
+
+        if self.type in (int, float):
             if 'min' in info and 'max' in info:
                 self.min = self.eval(info['min'])
                 self.max = self.eval(info['max'])
@@ -252,17 +259,17 @@ class Control:
             row_layout.addWidget(self.cbox)
             key_layout.addLayout(row_layout)
 
-        elif self.type in (int,float):
+        elif self.type in (int, float):
 
             self.display = QLineEdit()
-            self.display.setAlignment(Qt.AlignRight)
+            self.display.setAlignment(Qt.AlignRight if qt5 else Qt.AlignmentFlag.AlignRight)
             self.display.setFont(font)
             self.display.returnPressed.connect(self.refresh)
 
             row_layout.addWidget(self.display)
             key_layout.addLayout(row_layout)
             if self.range is not None:
-                self.slider = QSlider(Qt.Horizontal)
+                self.slider = QSlider(Qt.Horizontal if qt5 else Qt.Orientation.Horizontal)
                 self.slider.setFont(font)
                 self.slider.setRange(0, self.range)
                 self.slider.valueChanged.connect(self.refresh)
@@ -276,7 +283,7 @@ class Control:
         else:
             # text
             self.text = QLineEdit()
-            self.text.setAlignment(Qt.AlignLeft)
+            self.text.setAlignment(Qt.AlignLeft if qt5 else Qt.AlignmentFlag.AlignLeft)
             self.text.setFont(font)
             self.text.returnPressed.connect(self.refresh)
             row_layout.addWidget(self.text)
@@ -533,7 +540,10 @@ def main(args=None):
         Thread(target=sp.loop).start()
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         sp.show()
-        app.exec_()
+        if qt5:
+            app.exec_()
+        else:
+            app.exec()
         sp.running = False
     except:
         node.destroy_node()
