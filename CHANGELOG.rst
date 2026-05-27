@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package slider_publisher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* adapt to Qt6
+* Contributors: Olivier Kermorgant
+
 2.4.3 (2026-03-31)
 ------------------
 * add build status
