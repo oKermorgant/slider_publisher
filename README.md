@@ -42,7 +42,7 @@ Many examples are given, especially
 
 Array-based messages are also possible (nested arrays are not).
 
-The packages reduces to a single node that has to be called with an argument leading to a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
+The packages reduces to a single node that has to be given a YAML file with the following structure (examples corresponding to the VelPose.yaml file):
 
     topic_to_be_published:  
         type: full message or service type    (geometry_msgs/Twist or geometry_msgs/msg/Twist)
