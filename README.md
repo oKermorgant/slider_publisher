@@ -67,7 +67,7 @@ If the type is a service interface then the corresponding slider will call the s
 Input will rely either on a checkbox (`Bool` type) or a text input.
 
 - Numeric types: if min/max values are provided, a slider will also be available
-- All types: if the default value is a list, a combobox will be used for the input, the first element of the list being the defalut value (see e.g. `tf.yaml` example)
+- All types: if the default value is a list, a combobox will be used for the input, the first element of the list being the default value (see e.g. `tf.yaml` example)
 
 
 ## Parameters
