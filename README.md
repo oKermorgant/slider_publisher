@@ -1,6 +1,6 @@
 # slider_publisher
 
-This packages proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
+This ROS 2 package proposes a slider-based publisher node similar to the joint_state_publisher, but that can publish any message or service.
 
 #### ROS Packages
 
