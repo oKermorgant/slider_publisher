@@ -11,8 +11,15 @@ This packages proposes a slider-based publisher node similar to the joint_state_
             <td>Jazzy <a href="http://build.ros2.org/job/Jbin_uN64__slider_publisher__ubuntu_noble_amd64__binary/"><img src="http://build.ros2.org/buildStatus/icon?job=Jbin_uN64__slider_publisher__ubuntu_noble_amd64__binary" alt="Build Status"/></td>
         </tr>
         <tr>
-            <td>Lyrical <a href="http://build.ros2.org/job/Lbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary/"><img src="http://build.ros2.org/buildStatus/icon?job=Lbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary" alt="Build Status"/></td>
-            <td>Rolling <a href="http://build.ros2.org/job/Rbin_uN64__slider_publisher__ubuntu_noble_amd64__binary/"><img src="http://build.ros2.org/buildStatus/icon?job=Rbin_uN64__slider_publisher__ubuntu_noble_amd64__binary" alt="Build Status"/></td>
+<td>Lyrical</td>
+<td><a href="http://build.ros2.org/job/Lbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary/">
+    <img src="http://build.ros2.org/buildStatus/icon?job=Lbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary" alt="Build Status"/>
+</td>
+<td>Rolling</td>
+<td><a href="http://build.ros2.org/job/Rbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary/">
+    <img src="http://build.ros2.org/buildStatus/icon?job=Rbin_uR64__slider_publisher__ubuntu_resolute_amd64__binary" alt="Build Status"/>
+</td>
+
         </tr>
     </tbody>
 </table>
