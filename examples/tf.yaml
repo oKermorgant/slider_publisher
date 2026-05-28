@@ -2,10 +2,10 @@
     type: tf2_msgs/msg/TFMessage
     frame_id:
         to: transforms[0].header.frame_id
-        default: [world,map]
+        default: [world,map]     # list of string makes the GUI rely on a drop-down menu
     child_frame_id:
         to: transforms[0].child_frame_id
-        default: base_link
+        default: base_link        # single string will be a text box
     x:
         to: transforms[0].transform.translation.x
     y:
