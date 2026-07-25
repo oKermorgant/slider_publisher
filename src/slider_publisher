@@ -11,6 +11,7 @@ from threading import Thread
 from copy import deepcopy
 import signal
 from geometry_msgs.msg import Quaternion
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from math import pi, cos, sin
 from ament_index_python import get_package_share_directory
 
@@ -104,6 +105,22 @@ def get_type(msg, key):
     elif 'string' in types[key]:
         return str
     return float
+
+
+def get_qos(durability):
+    mapper = {
+        None: DurabilityPolicy.VOLATILE,  # default
+        'VOLATILE': DurabilityPolicy.VOLATILE,
+        'TRANSIENT_LOCAL': DurabilityPolicy.TRANSIENT_LOCAL,
+        'SYSTEM_DEFAULT': DurabilityPolicy.SYSTEM_DEFAULT,
+    }
+
+    qos_profile = QoSProfile(
+        depth=10,
+        durability=mapper[durability],
+    )
+
+    return qos_profile
 
 
 def isRPY(key, msg):
@@ -302,18 +319,18 @@ class Publisher:
     '''
     node = None
 
-    def __init__(self, topic, msg, info, is_msg = True):
+    def __init__(self, topic, msg, info, qos, is_msg = True):
         self.topic = topic
         
         if is_msg:
             self.msg = msg()
-            self.pub = Publisher.node.create_publisher(msg, topic, 10)
+            self.pub = Publisher.node.create_publisher(msg, topic, qos)
             self.client = None
         else:
             self.msg = msg.Request()
             self.prev = msg.Request()
             self.pub = None
-            self.client = Publisher.node.create_client(msg, topic)
+            self.client = Publisher.node.create_client(msg, topic, qos)
             Publisher.node.get_logger().info('Waiting for service ' + topic)
             self.client.wait_for_service()
                     
@@ -343,7 +360,7 @@ class Publisher:
                 self.map[tag] = info[label]['to']
  
             else:
-                if label != 'type':
+                if label not in {'type', 'qos_durability'}:
                     # init non-zero defaults
                     if isRPY(label, self.msg):
                         field, axis = split_field(label)
@@ -464,7 +481,8 @@ class SliderPublisher(QWidget):
                 interface = 'msg' if here['msg'] else 'srv'
             
             msg = get_interface(pkg, interface, msg)
-            self.publishers[topic] = Publisher(topic, msg, info, interface == 'msg')
+            qos = get_qos(info.get('qos_durability'))
+            self.publishers[topic] = Publisher(topic, msg, info, qos, interface == 'msg')
             order.append((topic,[]))
             for key in info:
                 tag = key_tag(topic,key)

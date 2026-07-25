@@ -1,0 +1,28 @@
+/volatile:
+    type: std_msgs/Bool
+    qos_durability: VOLATILE
+    enabled:
+        to: data
+
+/transient_local:
+    type: std_msgs/Int32
+    qos_durability: TRANSIENT_LOCAL
+    value:
+        to: data
+        min: -255
+        max: 256
+
+/system_default:
+    type: std_msgs/Float64
+    qos_durability: SYSTEM_DEFAULT
+    value:
+        to: data
+        min: -3.14159
+        max: 3.14159
+
+/empty:
+    type: std_msgs/String
+    # default is VOLATILE
+    text:
+        to: data
+        default: "Hello"
