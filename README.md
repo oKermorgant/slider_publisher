@@ -46,6 +46,7 @@ The packages reduces to a single node that has to be given a YAML file with the 
 
     topic_to_be_published:  
         type: full message or service type    (geometry_msgs/Twist or geometry_msgs/msg/Twist)
+        qos_durability: QOS durability        (VOLATILE or TRANSIENT_LOCAL or SYSTEM_DEFAULT; VOLATILE if not specified)
         key_as_in_gui:                        (vx, can also be the message field)
             to: corresponding_message_field   (linear.x if not used as the key or not unique field)
             min: slider minimum value         (-1)
